@@ -8,12 +8,34 @@ namespace Ekenstein.Files.Extensions
 {
     public static class FileExtensions
     {
-        public static IFile<TExtra> Apply<TExtra>(this IFile file, Func<TExtra> extra)
-        {
-            return new AppliedFile<TExtra>(file, extra);
-        }
+        /// <summary>
+        /// Applies the extra value produced by the given <paramref name="extra"/> function
+        /// which takes the underlying file as an argument and applies it to the given <paramref name="file"/>.
+        /// </summary>
+        /// <typeparam name="TExtra">The type of the extra value for the file.</typeparam>
+        /// <param name="file">The file to apply the extra value to.</param>
+        /// <param name="extra">The extra value to be applied.</param>
+        /// <returns>An <see cref="IFile{TExtra}"/> containing the value produced by the given <paramref name="extra"/> function.</returns>
+        public static IFile<TExtra> Apply<TExtra>(this IFile file, Func<IFile, TExtra> extra) => new AppliedFile<TExtra>(file, extra);
 
-        public static IFile<TExtra> Apply<TExtra>(this IFile file, TExtra extra) => file.Apply(() => extra);
+        /// <summary>
+        /// Applies the extra value produced by the given <paramref name="extra"/> function 
+        /// to the given <paramref name="file"/>.
+        /// </summary>
+        /// <typeparam name="TExtra">The type of the extra value for the file.</typeparam>
+        /// <param name="file">The file to apply the extra value to.</param>
+        /// <param name="extra">The extra value to be applied.</param>
+        /// <returns>An <see cref="IFile{TExtra}"/> containing the value produced by the given <paramref name="extra"/> function.</returns>
+        public static IFile<TExtra> Apply<TExtra>(this IFile file, Func<TExtra> extra) => new AppliedFile<TExtra>(file, extra);
+
+        /// <summary>
+        /// Applies the given <paramref name="extra"/> value to the given <paramref name="file"/>.
+        /// </summary>
+        /// <typeparam name="TExtra">The type of the extra value for the file.</typeparam>
+        /// <param name="file">The file to apply the extra value to.</param>
+        /// <param name="extra">The extra value to be applied.</param>
+        /// <returns>An <see cref="IFile{TExtra}"/> containing the given <paramref name="extra"/>.</returns>
+        public static IFile<TExtra> Apply<TExtra>(this IFile file, TExtra extra) => new AppliedFile<TExtra>(file, extra);
 
         /// <summary>
         /// Renames the given <paramref name="file"/> file to the given <paramref name="fileName"/>.
@@ -121,11 +143,21 @@ namespace Ekenstein.Files.Extensions
 
         public static IAuthenticatedFile ToMD5(this IFile file) => file.ToAuth(MD5.Create(), "MD5");
 
+        /// <summary>
+        /// Returns the MD5 hash of the given <paramref name="file"/>.
+        /// </summary>
+        /// <param name="file">The file to produce an MD5 hash of.</param>
+        /// <returns>A byte array representing the MD5 hash of the file.</returns>
         public static Task<byte[]> GetMD5(this IFile file)
         {
             return file.ToMD5().GetHashAsync();
         }
 
+        /// <summary>
+        /// Returns the SHA256 hash of the given <paramref name="file"/>.
+        /// </summary>
+        /// <param name="file">The file to produce an SHA256 hash of.</param>
+        /// <returns>A byte array representing the SHA256 hash of the file.</returns>
         public static Task<byte[]> GetSHA256(this IFile file)
         {
             return file.ToSHA256().GetHashAsync();

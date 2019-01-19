@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Ekenstein.Files
 {
+    /// <summary>
+    /// A storage which prefixes all the tags with a given prefix.
+    /// </summary>
     public class PrefixedStorage : IStorage
     {
         private readonly IStorage _storage;
@@ -27,9 +30,9 @@ namespace Ekenstein.Files
 
         public Task CreateFileAsync(IFile file, string tag) => _storage.CreateFileAsync(file, ToPrefixedTag(tag));
 
-        public Task DeleteFileAsync(IFileInfo file, string tag) => _storage.DeleteFileAsync(file, ToPrefixedTag(tag));
+        public Task<bool> DeleteFileAsync(IFileInfo file, string tag) => _storage.DeleteFileAsync(file, ToPrefixedTag(tag));
 
-        public Task DeleteTagAsync(string tag) => _storage.DeleteTagAsync(ToPrefixedTag(tag));
+        public Task<bool> DeleteTagAsync(string tag) => _storage.DeleteTagAsync(ToPrefixedTag(tag));
 
         public void Dispose() => _storage.Dispose();
 
@@ -45,5 +48,8 @@ namespace Ekenstein.Files
                 .Select(FromPrefixedTag)
                 .ToArray();
         }
+
+        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag) => _storage
+            .MoveFileAsync(file, ToPrefixedTag(tag), ToPrefixedTag(destinationTag));
     }
 }

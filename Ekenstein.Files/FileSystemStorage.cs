@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Ekenstein.Files
 {
+    /// <summary>
+    /// A storage for handling moving/creating/deleting files
+    /// on a file system.
+    /// </summary>
     public class FileSystemStorage : IStorage
     {
         private readonly string _rootPath;
@@ -25,7 +29,7 @@ namespace Ekenstein.Files
             _rootPath = rootPath;
         }
 
-        private string GetTagPath(string tag) => Path.Combine(_rootPath, tag);
+        private string GetTagPath(string tag) => Path.Combine(_rootPath, Uri.EscapeDataString(tag));
         private string GetFilePath(string tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
 
         public async Task CreateFileAsync(IFile file, string tag)
@@ -35,35 +39,35 @@ namespace Ekenstein.Files
                 throw new ArgumentNullException(nameof(file));
             }
 
-            using (var fs = File.OpenWrite(GetFilePath(tag, file))
+            using (var fs = File.OpenWrite(GetFilePath(tag, file)))
             {
                 await file.CopyToAsync(fs);
                 await fs.FlushAsync();
             }
         }
 
-        public Task DeleteFileAsync(IFileInfo file, string tag)
+        public Task<bool> DeleteFileAsync(IFileInfo file, string tag)
         {
             var filePath = GetFilePath(tag, file);
             if (!File.Exists(filePath))
             {
-                return Task.FromResult(0);
+                return Task.FromResult(false);
             }
 
             File.Delete(filePath);
-            return Task.FromResult(0);
+            return Task.FromResult(true);
         }
 
-        public Task DeleteTagAsync(string tag)
+        public Task<bool> DeleteTagAsync(string tag)
         {
             var path = GetTagPath(tag);
             if (!Directory.Exists(path))
             {
-                return Task.FromResult(0);
+                return Task.FromResult(false);
             }
 
             Directory.Delete(path, true);
-            return Task.FromResult(0);
+            return Task.FromResult(true);
         }
 
         public void Dispose()
@@ -98,8 +102,21 @@ namespace Ekenstein.Files
 
         public Task<IReadOnlyList<string>> GetTagsAsync()
         {
-            var directories = Directory.GetDirectories(_rootPath).ToArray();
+            var directories = Directory
+                .GetDirectories(_rootPath)
+                .Select(Uri.UnescapeDataString)
+                .Union(new [] { string.Empty })
+                .ToArray();
             return Task.FromResult<IReadOnlyList<string>>(directories);
+        }
+
+        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag)
+        {
+            var filePath = GetFilePath(tag, file);
+            var destinationPath = GetFilePath(destinationTag, file);
+
+            File.Move(filePath, destinationPath);
+            return Task.FromResult(0);
         }
     }
 }

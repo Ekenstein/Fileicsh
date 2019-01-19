@@ -5,6 +5,9 @@ using HeyRed.Mime;
 
 namespace Ekenstein.Files
 {
+    /// <summary>
+    /// A file located on the file system.
+    /// </summary>
     public class FileSystemFile : IFile
     {
         private readonly string _filePath;
