@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Async;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -86,18 +87,19 @@ namespace Ekenstein.Files
             return Task.FromResult<IFile>(file);
         }
 
-        public Task<IEnumerable<IFile>> GetFilesAsync(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(string tag)
         {
             var tagPath = GetTagPath(tag);
             if (!Directory.Exists(tagPath))
             {
-                return Task.FromResult(Enumerable.Empty<IFile>());
+                return AsyncEnumerable.Empty<IFile>();
             }
 
             var files = Directory.GetFiles(tagPath)
-                .Select(path => new FileSystemFile(path));
+                .Select(path => new FileSystemFile(path))
+                .Cast<IFile>();
 
-            return Task.FromResult<IEnumerable<IFile>>(files);
+            return files.ToAsyncEnumerable();
         }
 
         public Task<IReadOnlyList<string>> GetTagsAsync()

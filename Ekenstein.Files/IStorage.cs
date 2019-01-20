@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Async;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -53,7 +54,7 @@ namespace Ekenstein.Files
         /// </summary>
         /// <param name="tag">The tag the files should be associated with.</param>
         /// <returns>A collection of zero or more files associated with the given <paramref name="tag"/>.</returns>
-        Task<IEnumerable<IFile>> GetFilesAsync(string tag);
+        IAsyncEnumerable<IFile> GetFiles(string tag);
 
         /// <summary>
         /// Associates the given <paramref name="file"/>, currently associated with the given <paramref name="tag"/>,

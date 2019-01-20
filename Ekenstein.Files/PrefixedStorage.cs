@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Async;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace Ekenstein.Files
 
         public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag) => _storage.GetFileAsync(fileInfo, ToPrefixedTag(tag));
 
-        public Task<IEnumerable<IFile>> GetFilesAsync(string tag) => _storage.GetFilesAsync(ToPrefixedTag(tag));
+        public IAsyncEnumerable<IFile> GetFiles(string tag) => _storage.GetFiles(ToPrefixedTag(tag));
 
         public async Task<IReadOnlyList<string>> GetTagsAsync()
         {

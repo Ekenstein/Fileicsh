@@ -2,6 +2,7 @@
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using System;
+using System.Collections.Async;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,7 +106,7 @@ namespace Ekenstein.Files.SFTP
             
             if (sftpFile.IsDirectory)
             {
-                var files = await ListFiles(sftpFile.FullName);
+                var files = await ListFilesAsync(sftpFile.FullName);
                 foreach (var file in files)
                 {
                     await DeleteRecursiveAsync(file);
@@ -154,10 +155,10 @@ namespace Ekenstein.Files.SFTP
             }
 
             var file = _sftpClient.Get(filePath);
-            return Task.FromResult<IFile>(new SftpRegularFile(_sftpClient, file));
+            return Task.FromResult<IFile>(new SftpRegularFile(_sftpClient.ConnectionInfo, file));
         }
 
-        public async Task<IEnumerable<IFile>> GetFilesAsync(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(string tag)
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -165,14 +166,18 @@ namespace Ekenstein.Files.SFTP
             var tagPath = GetTagPath(tag);
             if (!_sftpClient.Exists(tagPath))
             {
-                return Enumerable.Empty<IFile>();
+                return AsyncEnumerable.Empty<IFile>();
             }
 
-            var files = await ListFiles(_rootDirectory);
-            
-            return files
-                .Where(f => f.IsRegularFile)
-                .Select(f => new SftpRegularFile(_sftpClient, f));
+            return new AsyncEnumerable<IFile>(async yield =>
+            {
+                var files = await ListFilesAsync(tagPath);
+                
+                foreach (var file in files.Where(f => f.IsRegularFile))
+                {
+                    await yield.ReturnAsync(new SftpRegularFile(_sftpClient.ConnectionInfo, file));
+                }
+            });
         }
 
         public async Task<IReadOnlyList<string>> GetTagsAsync()
@@ -180,7 +185,7 @@ namespace Ekenstein.Files.SFTP
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
-            var files = await ListFiles(_rootDirectory);
+            var files = await ListFilesAsync(_rootDirectory);
             return files
                 .Where(f => f.IsDirectory)
                 .Where(f => f.Name != "." && f.Name != "..")
@@ -189,7 +194,7 @@ namespace Ekenstein.Files.SFTP
                 .ToArray();
         }
 
-        private Task<IEnumerable<SftpFile>> ListFiles(string directory)
+        private Task<IEnumerable<SftpFile>> ListFilesAsync(string directory)
         {
             return Task.Factory.FromAsync(_sftpClient.BeginListDirectory(directory, null, null), r => _sftpClient.EndListDirectory(r));
         }
@@ -226,26 +231,46 @@ namespace Ekenstein.Files.SFTP
 
         private class SftpRegularFile : IFile
         {
+            private bool _disposed;
             private readonly SftpClient _client;
             private readonly SftpFile _file;
 
-            public string FileName => Path.GetFileName(_file.FullName);
+            public string FileName => _file.Name;
             public string ContentType => MimeTypesMap.GetMimeType(FileName);
 
-            public SftpRegularFile(SftpClient client, SftpFile file)
+            public SftpRegularFile(ConnectionInfo connectionInfo, SftpFile file)
             {
-                _client = client ?? throw new ArgumentNullException(nameof(client));
+                if (connectionInfo == null)
+                {
+                    throw new ArgumentNullException(nameof(connectionInfo));
+                }
+
+                _client = new SftpClient(connectionInfo);
                 _file = file ?? throw new ArgumentNullException(nameof(file));
             }
 
             public Task CopyToAsync(Stream outputStream)
             {
+                ThrowIfDisposed();
                 ConnectIfDisconnected();
                 return Task.Factory.FromAsync(_client.BeginDownloadFile(_file.FullName, outputStream), r => _client.EndDownloadFile(r));
             }
 
             public void Dispose()
             {
+                if (!_disposed)
+                {
+                    _client.Dispose();
+                }
+                _disposed = true;
+            }
+
+            private void ThrowIfDisposed()
+            {
+                if (_disposed)
+                {
+                    throw new ObjectDisposedException(GetType().Name);
+                }
             }
 
             private void ConnectIfDisconnected()
@@ -258,6 +283,7 @@ namespace Ekenstein.Files.SFTP
 
             public Task<Stream> OpenReadStreamAsync()
             {
+                ThrowIfDisposed();
                 ConnectIfDisconnected();
                 return Task.FromResult<Stream>(_client.OpenRead(_file.FullName));
             }

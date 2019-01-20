@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AsyncEnumerator" Version="2.2.1" />
     <PackageReference Include="MimeTypesMap" Version="1.0.3" />
   </ItemGroup>
 
