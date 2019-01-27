@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using HeyRed.Mime;
 
 namespace Ekenstein.Files
 {
+    /// <inheritdoc />
     /// <summary>
     /// A file located on the file system.
     /// </summary>
@@ -26,12 +28,12 @@ namespace Ekenstein.Files
             _filePath = filePath;
         }
 
-        public async Task CopyToAsync(Stream outputStream)
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
         {
-            using (var readStream = await OpenReadStreamAsync())
+            using (var readStream = await OpenReadStreamAsync(cancellationToken))
             {
                 await readStream.CopyToAsync(outputStream);
-                await readStream.FlushAsync();
+                await readStream.FlushAsync(cancellationToken);
             }
         }
 
@@ -39,6 +41,10 @@ namespace Ekenstein.Files
         {
         }
 
-        public Task<Stream> OpenReadStreamAsync() => Task.FromResult<Stream>(File.OpenRead(_filePath));
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<Stream>(File.OpenRead(_filePath));
+        }
     }
 }

@@ -6,25 +6,30 @@ using System.Collections.Async;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Ekenstein.Files.SFTP.Helpers;
 
 namespace Ekenstein.Files.SFTP
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// A storage targeting an SFTP backend.
+    /// </summary>
     public class SftpStorage : IStorage
     {
         private readonly SftpClient _sftpClient;
         private readonly string _rootDirectory;
         private bool _disposed;
 
-        public SftpStorage(string host, int port, string userName, string password, string rootDirectory = "/")
+        public SftpStorage(SftpClient sftpClient, string rootDirectory = "/")
         {
             if (string.IsNullOrWhiteSpace(rootDirectory))
             {
                 throw new ArgumentException("Root directory must not be null or white space.");
             }
 
-            _sftpClient = new SftpClient(host, port, userName, password);
+            _sftpClient = sftpClient ?? throw new ArgumentNullException(nameof(sftpClient));
             _rootDirectory = rootDirectory;
         }
 
@@ -40,7 +45,7 @@ namespace Ekenstein.Files.SFTP
                 .Replace("\\", "/");
         }
 
-        public async Task CreateFileAsync(IFile file, string tag)
+        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -58,62 +63,39 @@ namespace Ekenstein.Files.SFTP
 
             var filePath = GetFilePath(file, tag);
 
-            using (var stream = await file.OpenReadStreamAsync())
+            using (var stream = await file.OpenReadStreamAsync(cancellationToken))
             {
-                await Task.Factory.FromAsync(
-                    _sftpClient.BeginUploadFile(stream, filePath),
-                    result => _sftpClient.EndUploadFile(result));
+                await _sftpClient.UploadFileAsync(filePath, stream, cancellationToken);
             }
         }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag)
+        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
             var filePath = GetFilePath(file, tag);
+
+            cancellationToken.ThrowIfCancellationRequested();
             if (!_sftpClient.Exists(filePath))
             {
                 return Task.FromResult(false);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             _sftpClient.DeleteFile(filePath);
             return Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteTagAsync(string tag)
+        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
             
             var path = GetTagPath(tag);
-            if (!_sftpClient.Exists(path))
-            {
-                return false;
-            }
-
-            var directory = _sftpClient.Get(path);
-            await DeleteRecursiveAsync(directory);
-            return true;
-        }
-
-        private async Task DeleteRecursiveAsync(SftpFile sftpFile)
-        {
-            if (sftpFile.Name == "." || sftpFile.Name == "..")
-            {
-                return;
-            }
-            
-            if (sftpFile.IsDirectory)
-            {
-                var files = await ListFilesAsync(sftpFile.FullName);
-                foreach (var file in files)
-                {
-                    await DeleteRecursiveAsync(file);
-                }
-            }
-
-            _sftpClient.Delete(sftpFile.FullName);
+            return _sftpClient.DeleteDirectoryAsync(path, true, cancellationToken);
         }
 
         public void Dispose()
@@ -143,17 +125,21 @@ namespace Ekenstein.Files.SFTP
             }
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag)
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
             var filePath = GetFilePath(fileInfo, tag);
+
+            cancellationToken.ThrowIfCancellationRequested();
             if (!_sftpClient.Exists(filePath))
             {
                 return Task.FromResult<IFile>(null);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             var file = _sftpClient.Get(filePath);
             return Task.FromResult<IFile>(new SftpRegularFile(_sftpClient.ConnectionInfo, file));
         }
@@ -171,7 +157,7 @@ namespace Ekenstein.Files.SFTP
 
             return new AsyncEnumerable<IFile>(async yield =>
             {
-                var files = await ListFilesAsync(tagPath);
+                var files = await _sftpClient.ListDirectoryAsync(tagPath);
                 
                 foreach (var file in files.Where(f => f.IsRegularFile))
                 {
@@ -180,12 +166,13 @@ namespace Ekenstein.Files.SFTP
             });
         }
 
-        public async Task<IReadOnlyList<string>> GetTagsAsync()
+        public async Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
-            var files = await ListFilesAsync(_rootDirectory);
+            var files = await _sftpClient.ListDirectoryAsync(_rootDirectory, cancellationToken);
             return files
                 .Where(f => f.IsDirectory)
                 .Where(f => f.Name != "." && f.Name != "..")
@@ -194,29 +181,33 @@ namespace Ekenstein.Files.SFTP
                 .ToArray();
         }
 
-        private Task<IEnumerable<SftpFile>> ListFilesAsync(string directory)
+        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.Factory.FromAsync(_sftpClient.BeginListDirectory(directory, null, null), r => _sftpClient.EndListDirectory(r));
-        }
-
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag)
-        {
+            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
             var filePath = GetFilePath(file, tag);
+
+            cancellationToken.ThrowIfCancellationRequested();
             if (!_sftpClient.Exists(filePath))
             {
                 return Task.FromResult(0);
             }
 
             var destinationTagPath = GetTagPath(destinationTag);
+
+            cancellationToken.ThrowIfCancellationRequested();
             if (!_sftpClient.Exists(destinationTagPath))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 _sftpClient.CreateDirectory(destinationTagPath);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             var sftpFile = _sftpClient.Get(filePath);
+
+            cancellationToken.ThrowIfCancellationRequested();
             sftpFile.MoveTo(GetFilePath(file, destinationTag));
             return Task.FromResult(0);
         }
@@ -249,11 +240,12 @@ namespace Ekenstein.Files.SFTP
                 _file = file ?? throw new ArgumentNullException(nameof(file));
             }
 
-            public Task CopyToAsync(Stream outputStream)
+            public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 ThrowIfDisposed();
                 ConnectIfDisconnected();
-                return Task.Factory.FromAsync(_client.BeginDownloadFile(_file.FullName, outputStream), r => _client.EndDownloadFile(r));
+                return _client.DownloadToStreamAsync(_file.FullName, outputStream, cancellationToken);
             }
 
             public void Dispose()
@@ -281,8 +273,9 @@ namespace Ekenstein.Files.SFTP
                 }
             }
 
-            public Task<Stream> OpenReadStreamAsync()
+            public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 ThrowIfDisposed();
                 ConnectIfDisconnected();
                 return Task.FromResult<Stream>(_client.OpenRead(_file.FullName));

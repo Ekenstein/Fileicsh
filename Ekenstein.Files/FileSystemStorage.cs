@@ -3,10 +3,12 @@ using System.Collections.Async;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files
 {
+    /// <inheritdoc />
     /// <summary>
     /// A storage for handling moving/creating/deleting files
     /// on a file system.
@@ -33,7 +35,7 @@ namespace Ekenstein.Files
         private string GetTagPath(string tag) => Path.Combine(_rootPath, Uri.EscapeDataString(tag));
         private string GetFilePath(string tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
 
-        public async Task CreateFileAsync(IFile file, string tag)
+        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (file == null)
             {
@@ -42,12 +44,12 @@ namespace Ekenstein.Files
 
             using (var fs = File.OpenWrite(GetFilePath(tag, file)))
             {
-                await file.CopyToAsync(fs);
-                await fs.FlushAsync();
+                await file.CopyToAsync(fs, cancellationToken);
+                await fs.FlushAsync(cancellationToken);
             }
         }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag)
+        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var filePath = GetFilePath(tag, file);
             if (!File.Exists(filePath))
@@ -59,7 +61,7 @@ namespace Ekenstein.Files
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteTagAsync(string tag)
+        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var path = GetTagPath(tag);
             if (!Directory.Exists(path))
@@ -75,7 +77,7 @@ namespace Ekenstein.Files
         {
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag)
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var filePath = GetFilePath(tag, fileInfo);
             if (!File.Exists(filePath))
@@ -102,7 +104,7 @@ namespace Ekenstein.Files
             return files.ToAsyncEnumerable();
         }
 
-        public Task<IReadOnlyList<string>> GetTagsAsync()
+        public Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var directories = Directory
                 .GetDirectories(_rootPath)
@@ -112,7 +114,7 @@ namespace Ekenstein.Files
             return Task.FromResult<IReadOnlyList<string>>(directories);
         }
 
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag)
+        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var filePath = GetFilePath(tag, file);
             var destinationPath = GetFilePath(destinationTag, file);

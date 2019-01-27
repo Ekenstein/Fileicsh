@@ -2,6 +2,7 @@
 using System.Collections.Async;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files
@@ -29,28 +30,42 @@ namespace Ekenstein.Files
         private bool IsPrefixedTag(string tag) => tag.StartsWith(_prefix);
         private string FromPrefixedTag(string prefixedTag) => prefixedTag.Substring(_prefix.Length);
 
-        public Task CreateFileAsync(IFile file, string tag) => _storage.CreateFileAsync(file, ToPrefixedTag(tag));
+        public Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _storage.CreateFileAsync(file, ToPrefixedTag(tag), cancellationToken);
+        }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag) => _storage.DeleteFileAsync(file, ToPrefixedTag(tag));
+        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _storage.DeleteFileAsync(file, ToPrefixedTag(tag), cancellationToken);
+        }
 
-        public Task<bool> DeleteTagAsync(string tag) => _storage.DeleteTagAsync(ToPrefixedTag(tag));
+        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _storage.DeleteTagAsync(ToPrefixedTag(tag), cancellationToken);
+        }
 
         public void Dispose() => _storage.Dispose();
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag) => _storage.GetFileAsync(fileInfo, ToPrefixedTag(tag));
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _storage.GetFileAsync(fileInfo, ToPrefixedTag(tag), cancellationToken);
+        }
 
         public IAsyncEnumerable<IFile> GetFiles(string tag) => _storage.GetFiles(ToPrefixedTag(tag));
 
-        public async Task<IReadOnlyList<string>> GetTagsAsync()
+        public async Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var tags = await _storage.GetTagsAsync();
+            var tags = await _storage.GetTagsAsync(cancellationToken);
             return tags
                 .Where(IsPrefixedTag)
                 .Select(FromPrefixedTag)
                 .ToArray();
         }
 
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag) => _storage
-            .MoveFileAsync(file, ToPrefixedTag(tag), ToPrefixedTag(destinationTag));
+        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _storage.MoveFileAsync(file, ToPrefixedTag(tag), ToPrefixedTag(destinationTag), cancellationToken);
+        }
     }
 }

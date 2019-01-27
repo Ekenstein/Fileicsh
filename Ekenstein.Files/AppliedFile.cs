@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files
 {
+    /// <inheritdoc />
     /// <summary>
     /// An abstraction which encapsulates an underlying file and applies
-    /// a value of type <typeparamref name="TExtra"/>.
+    /// a value of type <typeparamref name="TExtra" />.
     /// </summary>
     /// <typeparam name="TExtra">The type encapsulating the extra value of the file.</typeparam>
     public class AppliedFile<TExtra> : IFile<TExtra>
@@ -54,10 +56,11 @@ namespace Ekenstein.Files
         {
         }
 
-        public Task CopyToAsync(Stream outputStream) => _file.CopyToAsync(outputStream);
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken)) => _file
+            .CopyToAsync(outputStream, cancellationToken);
 
         public void Dispose() => _file.Dispose();
 
-        public Task<Stream> OpenReadStreamAsync() => _file.OpenReadStreamAsync();
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
     }
 }

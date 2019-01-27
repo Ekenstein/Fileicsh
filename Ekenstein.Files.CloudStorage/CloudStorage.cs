@@ -1,10 +1,10 @@
-﻿using HeyRed.Mime;
+﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Async;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files.CloudStorage
@@ -24,57 +24,57 @@ namespace Ekenstein.Files.CloudStorage
             return _client.GetContainerReference(containerName);
         }
 
-        public async Task CreateFileAsync(IFile file, string tag)
+        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
-            await container.CreateIfNotExistsAsync();
+            await container.CreateIfNotExistsAsync(cancellationToken);
 
             var fileReference = container.GetBlockBlobReference(file.FileName);
             fileReference.Properties.ContentType = file.ContentType;
 
-            using (var readStream = await file.OpenReadStreamAsync())
+            using (var readStream = await file.OpenReadStreamAsync(cancellationToken))
             {
-                await fileReference.UploadFromStreamAsync(readStream);
+                await fileReference.UploadFromStreamAsync(readStream, cancellationToken);
             }
         }
 
-        public async Task<bool> DeleteFileAsync(IFileInfo file, string tag)
+        public async Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
-            if (!await container.ExistsAsync())
+            if (!await container.ExistsAsync(cancellationToken))
             {
                 return false;
             }
 
             var fileReference = container.GetBlockBlobReference(file.FileName);
-            return await fileReference.DeleteIfExistsAsync();
+            return await fileReference.DeleteIfExistsAsync(cancellationToken);
         }
 
-        public async Task<bool> DeleteTagAsync(string tag)
+        public async Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
-            return await container.DeleteIfExistsAsync();
+            return await container.DeleteIfExistsAsync(cancellationToken);
         }
 
         public void Dispose()
         {
         }
 
-        public async Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag)
+        public async Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
-            if (!await container.ExistsAsync())
+            if (!await container.ExistsAsync(cancellationToken))
             {
                 return null;
             }
 
             var file = container.GetBlockBlobReference(fileInfo.FileName);
-            if (!await file.ExistsAsync())
+            if (!await file.ExistsAsync(cancellationToken))
             {
                 return null;
             }
 
-            return new CloudBlockBlobFile(file);
+            return new CloudBlobFile(file);
         }
 
         public IAsyncEnumerable<IFile> GetFiles(string tag)
@@ -97,7 +97,7 @@ namespace Ekenstein.Files.CloudStorage
                     foreach (var blob in blobs.Results.OfType<CloudBlockBlob>())
                     {
                         await blob.FetchAttributesAsync();
-                        await yield.ReturnAsync(new CloudBlockBlobFile(blob)).ConfigureAwait(false);
+                        await yield.ReturnAsync(new CloudBlobFile(blob)).ConfigureAwait(false);
                     }
 
                     continuationToken = blobs.ContinuationToken;
@@ -105,7 +105,7 @@ namespace Ekenstein.Files.CloudStorage
             });
         }
 
-        public Task<IReadOnlyList<string>> GetTagsAsync()
+        public Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var containers = _client
                 .ListContainers()
@@ -116,50 +116,32 @@ namespace Ekenstein.Files.CloudStorage
             return Task.FromResult<IReadOnlyList<string>>(containers);
         }
 
-        public async Task MoveFileAsync(IFileInfo file, string tag, string destinationTag)
+        public async Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
-            if (!await container.ExistsAsync())
+            if (!await container.ExistsAsync(cancellationToken))
             {
                 return;
             }
 
             var cloudBlobFile = container.GetBlockBlobReference(file.FileName);
-            if (!await cloudBlobFile.ExistsAsync())
+            if (!await cloudBlobFile.ExistsAsync(cancellationToken))
             {
                 return;
             }
 
             var destinationContainer = GetContainer(destinationTag);
-            await destinationContainer.CreateIfNotExistsAsync();
+            await destinationContainer.CreateIfNotExistsAsync(cancellationToken);
             
             var destinationBlob = destinationContainer.GetBlockBlobReference(file.FileName);
-            await destinationBlob.StartCopyAsync(cloudBlobFile);
-            await cloudBlobFile.DeleteAsync();
+            await destinationBlob.StartCopyAsync(cloudBlobFile, cancellationToken);
+            await cloudBlobFile.DeleteAsync(cancellationToken);
         }
-
-        private class CloudBlockBlobFile : IFile
-        {
-            private readonly ICloudBlob _blob;
-
-            public string FileName => _blob.Name;
-
-            public string ContentType => _blob
-                .Properties
-                .ContentType ?? MimeTypesMap.GetMimeType(FileName);
-
-            public CloudBlockBlobFile(ICloudBlob blob)
-            {
-                _blob = blob ?? throw new ArgumentNullException(nameof(blob));
-            }
-
-            public Task CopyToAsync(Stream outputStream) => _blob.DownloadToStreamAsync(outputStream);
-
-            public void Dispose()
-            {
-            }
-
-            public Task<Stream> OpenReadStreamAsync() => _blob.OpenReadAsync();
-        }
+        
+        /// <summary>
+        /// Creates a cloud storage which targets the development account.
+        /// Make sure that Azure Storage Emulator is running for this storage to work.
+        /// </summary>
+        public static IStorage DevelopmentStorage => new CloudStorage(CloudStorageAccount.DevelopmentStorageAccount.CreateCloudBlobClient());
     }
 }

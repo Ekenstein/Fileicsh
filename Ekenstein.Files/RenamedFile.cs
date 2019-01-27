@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files
@@ -37,9 +38,11 @@ namespace Ekenstein.Files
             _fileName = new Lazy<string>(() => RenameFile(fileName, keepExtension));
         }
 
-        public Task CopyToAsync(Stream outputStream) => _file.CopyToAsync(outputStream);
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken)) => _file
+            .CopyToAsync(outputStream);
 
-        public Task<Stream> OpenReadStreamAsync() => _file.OpenReadStreamAsync();
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file
+            .OpenReadStreamAsync(cancellationToken);
 
         private string RenameFile(string fileName, bool keepExtension) => keepExtension
             ? Path.GetFileNameWithoutExtension(fileName) + Path.GetExtension(_file.FileName)

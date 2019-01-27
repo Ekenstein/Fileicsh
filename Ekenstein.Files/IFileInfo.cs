@@ -1,5 +1,8 @@
 ﻿namespace Ekenstein.Files
 {
+    /// <summary>
+    /// Information about a file.
+    /// </summary>
     public interface IFileInfo
     {
         /// <summary>

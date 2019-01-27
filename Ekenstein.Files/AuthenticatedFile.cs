@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ekenstein.Files
@@ -41,12 +42,12 @@ namespace Ekenstein.Files
             HashAlgorithm = hashAlgorithmName;
         }
 
-        public async Task CopyToAsync(Stream outputStream)
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
         {
             var cryptoStream = new CryptoStream(outputStream, _hashAlgorithm, CryptoStreamMode.Write);
             _hashAlgorithm.Initialize();
-            await _file.CopyToAsync(cryptoStream);
-            await cryptoStream.FlushAsync();
+            await _file.CopyToAsync(cryptoStream, cancellationToken);
+            await cryptoStream.FlushAsync(cancellationToken);
             _hash = _hashAlgorithm.Hash;
         }
 
@@ -62,6 +63,6 @@ namespace Ekenstein.Files
             return _hash;
         }
 
-        public Task<Stream> OpenReadStreamAsync() => _file.OpenReadStreamAsync();
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
     }
 }
