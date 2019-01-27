@@ -1,13 +1,14 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System;
+﻿using System;
 using System.Collections.Async;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Fileicsh.Abstraction;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Ekenstein.Files.CloudStorage
+namespace Fileicsh.CloudStorage
 {
     public class CloudStorage : IStorage
     {

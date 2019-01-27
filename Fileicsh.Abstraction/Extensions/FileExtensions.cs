@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ekenstein.Files.Extensions
+namespace Fileicsh.Abstraction.Extensions
 {
     public static class FileExtensions
     {

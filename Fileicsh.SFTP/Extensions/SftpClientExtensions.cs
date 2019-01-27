@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 
-namespace Ekenstein.Files.SFTP.Helpers
+namespace Fileicsh.Extensions
 {
     public static class SftpClientExtensions
     {

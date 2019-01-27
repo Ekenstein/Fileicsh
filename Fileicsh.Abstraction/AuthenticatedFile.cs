@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ekenstein.Files
+namespace Fileicsh.Abstraction
 {
     public class AuthenticatedFile<TExtra> : AuthenticatedFile, IAuthenticatedFile<TExtra>
     {

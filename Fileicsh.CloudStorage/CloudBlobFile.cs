@@ -1,11 +1,12 @@
-﻿using HeyRed.Mime;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Fileicsh.Abstraction;
+using HeyRed.Mime;
+using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Ekenstein.Files.CloudStorage
+namespace Fileicsh.CloudStorage
 {
     public class CloudBlobFile : IFile
     {

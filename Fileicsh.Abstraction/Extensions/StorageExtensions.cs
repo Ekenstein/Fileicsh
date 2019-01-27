@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Ekenstein.Files.Extensions
+namespace Fileicsh.Abstraction.Extensions
 {
     public static class StorageExtensions
     {

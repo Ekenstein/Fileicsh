@@ -1,4 +1,4 @@
-﻿namespace Ekenstein.Files
+﻿namespace Fileicsh.Abstraction
 {
     /// <summary>
     /// Information about a file.

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Ekenstein.Files
+namespace Fileicsh.Abstraction
 {
     /// <inheritdoc />
     /// <summary>

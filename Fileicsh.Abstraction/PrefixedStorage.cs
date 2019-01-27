@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ekenstein.Files
+namespace Fileicsh.Abstraction
 {
     /// <summary>
     /// A storage which prefixes all the tags with a given prefix.

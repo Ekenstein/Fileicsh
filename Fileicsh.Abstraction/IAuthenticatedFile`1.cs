@@ -1,4 +1,4 @@
-﻿namespace Ekenstein.Files
+﻿namespace Fileicsh.Abstraction
 {
     /// <inheritdoc cref="IAuthenticatedFile" />
     /// <inheritdoc cref="IFile{TExtra}" />

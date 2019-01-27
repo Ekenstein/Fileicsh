@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HeyRed.Mime;
 
-namespace Ekenstein.Files
+namespace Fileicsh.Abstraction
 {
     /// <inheritdoc />
     /// <summary>

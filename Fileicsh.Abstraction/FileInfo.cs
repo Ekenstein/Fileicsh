@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ekenstein.Files
+namespace Fileicsh.Abstraction
 {
     public class FileInfo<TExtra> : FileInfo, IFileInfo<TExtra>
     {

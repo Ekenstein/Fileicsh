@@ -1,16 +1,17 @@
-﻿using HeyRed.Mime;
-using Renci.SshNet;
-using Renci.SshNet.Sftp;
-using System;
+﻿using System;
 using System.Collections.Async;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ekenstein.Files.SFTP.Helpers;
+using Fileicsh.Abstraction;
+using Fileicsh.Extensions;
+using HeyRed.Mime;
+using Renci.SshNet;
+using Renci.SshNet.Sftp;
 
-namespace Ekenstein.Files.SFTP
+namespace Fileicsh.SFTP
 {
     /// <inheritdoc />
     /// <summary>
