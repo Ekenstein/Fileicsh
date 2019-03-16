@@ -28,6 +28,30 @@ namespace Fileicsh.Abstraction.Extensions
         public static IFileInfo<TExtra> AsFileInfo<TExtra>(this IFile<TExtra> file) => file;
 
         /// <summary>
+        /// Returns a new <see cref="IFileInfo"/> containing the given <paramref name="file"/>'s
+        /// information.
+        /// Makes sure that the returned file never can be casted to <see cref="IFile"/>.
+        /// </summary>
+        /// <param name="file">The file to extract the information from.</param>
+        /// <returns>
+        /// A new <see cref="IFileInfo"/> containing the information about the given <paramref name="file"/>.
+        /// </returns>
+        public static IFileInfo ToFileInfo(this IFile file) => new FileInfo(file.FileName, file.ContentType);
+
+        /// <summary>
+        /// Returns a new <see cref="IFileInfo{TExtra}"/> containing the given <paramref name="file"/>'s
+        /// information.
+        /// Makes sure that the returned file never can be casterd to <see cref="IFile{TExtra}"/>.
+        /// </summary>
+        /// <typeparam name="TExtra">The type of extra information the <paramref name="file"/> contains.</typeparam>
+        /// <param name="file">The file to extract the information from.</param>
+        /// <returns>
+        /// A new <see cref="IFileInfo{TExtra}"/> containing the information about the given <paramref name="file"/>,
+        /// including the extra information.
+        /// </returns>
+        public static IFileInfo<TExtra> ToFileInfo<TExtra>(this IFile<TExtra> file) => new FileInfo<TExtra>(file.FileName, file.ContentType, file.Extra);
+
+        /// <summary>
         /// Applies the extra value produced by the given <paramref name="extra"/> function
         /// which takes the underlying file as an argument and applies it to the given <paramref name="file"/>.
         /// </summary>
