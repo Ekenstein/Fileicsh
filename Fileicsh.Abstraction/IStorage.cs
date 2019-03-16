@@ -10,7 +10,15 @@ namespace Fileicsh.Abstraction
     /// <summary>
     /// An abstraction of a storage which stores files
     /// associated with a certain tag.
+    /// Invariants:
+    /// (file, tag) => storage.CreateFileAsync(file, tag) => GetFiles(tag).Contains(file)
     /// </summary>
+    /// <remarks>
+    /// A tag is not guaranteed to sustain the same form in order to respect
+    /// various quirks in the underlying storage.
+    /// However, it is always guaranteed that a tag used to create a file
+    /// can be used to fetch the same file.
+    /// </remarks>
     public interface IStorage : IDisposable
     {
         /// <summary>

@@ -16,7 +16,7 @@ namespace Fileicsh.Abstraction
         private readonly IFile _file;
         private readonly Func<IFile, TExtra> _extra;
 
-        public TExtra Extra => _extra(this);
+        public TExtra Extra => _extra(_file);
 
         public string FileName => _file.FileName;
 
@@ -62,5 +62,7 @@ namespace Fileicsh.Abstraction
         public void Dispose() => _file.Dispose();
 
         public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
+
+
     }
 }

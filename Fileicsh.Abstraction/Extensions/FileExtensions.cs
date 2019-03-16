@@ -9,6 +9,25 @@ namespace Fileicsh.Abstraction.Extensions
     public static class FileExtensions
     {
         /// <summary>
+        /// Returns the <paramref name="file"/> as <see cref="IFileInfo"/>.
+        /// </summary>
+        /// <param name="file">The file to type as <see cref="IFileInfo"/>.</param>
+        /// <returns>
+        /// The <paramref name="file"/> typed as <see cref="IFileInfo"/>.
+        /// </returns>
+        public static IFileInfo AsFileInfo(this IFile file) => file;
+
+        /// <summary>
+        /// Returns the <paramref name="file"/> as <see cref="IFileInfo{TExtra}"/>.
+        /// </summary>
+        /// <typeparam name="TExtra">The type of extra info about the file.</typeparam>
+        /// <param name="file">The file to type as <see cref="IFileInfo{TExtra}"/></param>
+        /// <returns>
+        /// The <paramref name="file"/> typed as <see cref="IFileInfo{TExtra}"/>.
+        /// </returns>
+        public static IFileInfo<TExtra> AsFileInfo<TExtra>(this IFile<TExtra> file) => file;
+
+        /// <summary>
         /// Applies the extra value produced by the given <paramref name="extra"/> function
         /// which takes the underlying file as an argument and applies it to the given <paramref name="file"/>.
         /// </summary>
@@ -62,7 +81,34 @@ namespace Fileicsh.Abstraction.Extensions
         /// <returns>A <see cref="IFile"/> containing the renamed file.</returns>
         public static IFile<TExtra> Rename<TExtra>(this IFile<TExtra> file, string fileName, bool keepExtension = false)
         {
-            return new RenamedFile<TExtra>(file, fileName, keepExtension);
+            return file.Rename(fileName, keepExtension).Apply(() => file.Extra);
+        }
+
+        /// <summary>
+        /// Creates a file containing the underlying data of the given <paramref name="file"/>.
+        /// The data will be stored in memory.
+        /// </summary>
+        /// <param name="file">The file containing the data to store in memory.</param>
+        /// <returns>
+        /// A <see cref="IFile"/> which contains the data of the given <paramref name="file"/> stored
+        /// in memory.
+        /// </returns>
+        public static async Task<IFile> ToMemoryAsync(this IFile file) => new MemoryFile(file, await file.GetBytesAsync());
+
+        /// <summary>
+        /// Creates a file containing the underlying data of the given <paramref name="file"/>.
+        /// The data will be stored in memory.
+        /// </summary>
+        /// <typeparam name="TExtra">The extra info attached the the <paramref name="file"/>.</typeparam>
+        /// <param name="file">The file containing the data to store in memory.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> containing <see cref="IFile{TExtra}"/> which contains the data of the 
+        /// given <paramref name="file"/> stored in memory.
+        /// </returns>
+        public static async Task<IFile<TExtra>> ToMemoryAsync<TExtra>(this IFile<TExtra> file)
+        {
+            var memoryFile = await file.ToMemoryAsync();
+            return memoryFile.Apply(() => file.Extra);
         }
 
         /// <summary>
