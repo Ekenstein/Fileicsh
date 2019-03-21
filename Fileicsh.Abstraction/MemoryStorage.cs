@@ -46,7 +46,7 @@ namespace Fileicsh.Abstraction
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (file == null)
             {
@@ -66,6 +66,7 @@ namespace Fileicsh.Abstraction
             }
 
             files.Add(await file.ToMemoryAsync());
+            return true;
         }
 
         /// <summary>

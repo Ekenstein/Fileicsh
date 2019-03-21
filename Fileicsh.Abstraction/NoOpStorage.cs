@@ -19,9 +19,9 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(0);
+            return Task.FromResult(false);
         }
 
         /// <summary>

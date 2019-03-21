@@ -45,8 +45,10 @@ namespace Fileicsh.Abstraction
         /// <param name="file">The file to create.</param>
         /// <param name="tag">The tag that should be associated with the file.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
-        /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken));
+        /// <returns>
+        /// The <see cref="Task"/> that represents the asynchronous operation, containing
+        /// a flag indicating whether the file was successfully created or not.</returns>
+        Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Deletes the file corresponding to the given <paramref name="file"/> associated

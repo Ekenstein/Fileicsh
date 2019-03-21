@@ -30,7 +30,7 @@ namespace Fileicsh.Abstraction
         private bool IsPrefixedTag(string tag) => tag.StartsWith(_prefix);
         private string FromPrefixedTag(string prefixedTag) => prefixedTag.Substring(_prefix.Length);
 
-        public Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return _storage.CreateFileAsync(file, ToPrefixedTag(tag), cancellationToken);
         }

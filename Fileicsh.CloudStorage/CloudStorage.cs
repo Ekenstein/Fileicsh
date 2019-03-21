@@ -25,7 +25,7 @@ namespace Fileicsh.CloudStorage
             return _client.GetContainerReference(containerName);
         }
 
-        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var container = GetContainer(tag);
             await container.CreateIfNotExistsAsync(cancellationToken);
@@ -37,6 +37,8 @@ namespace Fileicsh.CloudStorage
             {
                 await fileReference.UploadFromStreamAsync(readStream, cancellationToken);
             }
+
+            return true;
         }
 
         public async Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))

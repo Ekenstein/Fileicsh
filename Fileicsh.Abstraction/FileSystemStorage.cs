@@ -35,7 +35,7 @@ namespace Fileicsh.Abstraction
         private string GetTagPath(string tag) => Path.Combine(_rootPath, Uri.EscapeDataString(tag));
         private string GetFilePath(string tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
 
-        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (file == null)
             {
@@ -47,6 +47,8 @@ namespace Fileicsh.Abstraction
                 await file.CopyToAsync(fs, cancellationToken);
                 await fs.FlushAsync(cancellationToken);
             }
+
+            return true;
         }
 
         public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))

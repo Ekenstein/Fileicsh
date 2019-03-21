@@ -62,7 +62,5 @@ namespace Fileicsh.Abstraction
         public void Dispose() => _file.Dispose();
 
         public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
-
-
     }
 }

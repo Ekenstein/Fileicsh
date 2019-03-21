@@ -46,7 +46,7 @@ namespace Fileicsh.SFTP
                 .Replace("\\", "/");
         }
 
-        public async Task CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -68,6 +68,8 @@ namespace Fileicsh.SFTP
             {
                 await _sftpClient.UploadFileAsync(filePath, stream, cancellationToken);
             }
+
+            return true;
         }
 
         public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
