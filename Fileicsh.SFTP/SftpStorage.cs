@@ -20,9 +20,17 @@ namespace Fileicsh.SFTP
     public class SftpStorage : IStorage
     {
         private readonly SftpClient _sftpClient;
-        private readonly string _rootDirectory;
+        public string RootDirectory { get; }
         private bool _disposed;
 
+        /// <summary>
+        /// Wraps the given <paramref name="sftpClient"/> in an <see cref="IStorage"/>
+        /// which will operate from the given <paramref name="rootDirectory"/>.
+        /// </summary>
+        /// <param name="sftpClient">The sftp client to wrap into an <see cref="IStorage"/>.</param>
+        /// <param name="rootDirectory">The root directory the storage will operate from.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="sftpClient"/> is null.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="rootDirectory"/> is null or white space.</exception>
         public SftpStorage(SftpClient sftpClient, string rootDirectory = "/")
         {
             if (string.IsNullOrWhiteSpace(rootDirectory))
@@ -31,12 +39,12 @@ namespace Fileicsh.SFTP
             }
 
             _sftpClient = sftpClient ?? throw new ArgumentNullException(nameof(sftpClient));
-            _rootDirectory = rootDirectory;
+            RootDirectory = rootDirectory;
         }
 
         private string GetTagPath(string tag)
         {
-            return Path.Combine(_rootDirectory, Uri.EscapeDataString(tag ?? string.Empty))
+            return Path.Combine(RootDirectory, Uri.EscapeDataString(tag ?? string.Empty))
                 .Replace("\\", "/");
         }
 
@@ -175,7 +183,7 @@ namespace Fileicsh.SFTP
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
-            var files = await _sftpClient.ListDirectoryAsync(_rootDirectory, cancellationToken);
+            var files = await _sftpClient.ListDirectoryAsync(RootDirectory, cancellationToken);
             return files
                 .Where(f => f.IsDirectory)
                 .Where(f => f.Name != "." && f.Name != "..")
