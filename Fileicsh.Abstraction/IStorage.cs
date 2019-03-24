@@ -29,14 +29,14 @@ namespace Fileicsh.Abstraction
         Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Returns the file corresponding to the given <paramref name="fileInfo"/> associated with the 
+        /// Returns the file corresponding to the given <paramref name="file"/> associated with the 
         /// given <paramref name="tag"/> or null if the file couldn't be found.
         /// </summary>
-        /// <param name="fileInfo">The information about the file.</param>
+        /// <param name="file">The information about the file.</param>
         /// <param name="tag">The tag the file is associated with.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the retrieved file.</returns>
-        Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IFile> GetFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Creates the given <paramref name="file"/> and associates

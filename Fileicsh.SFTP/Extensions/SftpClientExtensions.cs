@@ -145,6 +145,42 @@ namespace Fileicsh.Extensions
             return true;
         }
 
+        public static bool DeleteDirectory(this SftpClient client, string path, bool recursive)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path must not be null or white space.");
+            }
+
+            if (!client.Exists(path))
+            {
+                return false;
+            }
+
+            if (recursive)
+            {
+                var file = client.Get(path);
+                DeleteDirectoryRecursive(client, file);
+            }
+            else
+            {
+                var files = client.ListDirectory(path);
+                if (files.Any(f => f.Name != "." || f.Name != ".."))
+                {
+                    return false;
+                }
+
+                client.DeleteDirectory(path);
+            }
+
+            return true;
+        }
+
         private static async Task DeleteDirectoryRecursiveAsync(SftpClient client, SftpFile file)
         {
             if (file.Name == "." || file.Name == "..")
@@ -158,6 +194,25 @@ namespace Fileicsh.Extensions
                 foreach (var directoryFile in directoryFiles)
                 {
                     await DeleteDirectoryRecursiveAsync(client, directoryFile);
+                }
+            }
+
+            client.Delete(file.FullName);
+        }
+
+        private static void DeleteDirectoryRecursive(SftpClient client, SftpFile file)
+        {
+            if (file.Name == "." || file.Name == "..")
+            {
+                return;
+            }
+
+            if (file.IsDirectory)
+            {
+                var directoryFiles = client.ListDirectory(file.FullName);
+                foreach (var directoryFile in directoryFiles)
+                {
+                    DeleteDirectoryRecursive(client, directoryFile);
                 }
             }
 

@@ -54,6 +54,18 @@ namespace Fileicsh.SFTP
                 .Replace("\\", "/");
         }
 
+        /// <summary>
+        /// Creates the <paramref name="file"/> at the SFTP backend. The file we be
+        /// located in the path `<paramref name="tag"/>` relative to the <see cref="RootDirectory"/>.
+        /// If a file with the same name as the given <paramref name="file"/> already exist,
+        /// that file will be deleted.
+        /// </summary>
+        /// <param name="file">The file to create at the SFTP backend.</param>
+        /// <param name="tag">The name of the folder relative to the <see cref="RootDirectory"/> that the file will be uploaded to. The tag will be escaped.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
+        /// <returns>
+        /// A flag indicating whether the file was successfully uploaded or not.
+        /// </returns>
         public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
@@ -71,6 +83,10 @@ namespace Fileicsh.SFTP
             }
 
             var filePath = GetFilePath(file, tag);
+            if (_sftpClient.Exists(filePath))
+            {
+                _sftpClient.DeleteFile(filePath);
+            }
 
             using (var stream = await file.OpenReadStreamAsync(cancellationToken))
             {

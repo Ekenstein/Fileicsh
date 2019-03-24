@@ -5,6 +5,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\paket-files\Ekenstein\Rngers\Rngers\RandomExtensions.cs">
+      <Paket>True</Paket>
+      <Link>paket-files/RandomExtensions.cs</Link>
+    </Compile>
     <ProjectReference Include="..\Fileicsh.SFTP\Fileicsh.SFTP.csproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />

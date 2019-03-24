@@ -1,7 +1,11 @@
 ﻿using System.Threading.Tasks;
+using Fileicsh.Abstraction.Helpers;
 
 namespace Fileicsh.Abstraction.Extensions
 {
+    /// <summary>
+    /// Provides a static set of functions that extends <see cref="IStorage"/>.
+    /// </summary>
     public static class StorageExtensions
     {
         /// <summary>
@@ -11,10 +15,25 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="storage">The storage to prefix.</param>
         /// <param name="prefix">The prefix.</param>
         /// <returns>A prefixed storage which will add the given <paramref name="prefix"/> to the tags.</returns>
-        public static IStorage Prefix(this IStorage storage, string prefix)
+        public static IStorage PrefixWith(this IStorage storage, string prefix)
         {
             return new PrefixedStorage(storage, prefix);
         }
+
+        /// <summary>
+        /// Returns a new <see cref="IStorage"/> where the <paramref name="main"/> storage
+        /// will be shadowed by the <paramref name="shadow"/> storage.
+        /// This means that all the operations performed on the <paramref name="main"/> storage
+        /// also will be performed on the <paramref name="shadow"/> storage. Useful for backing up
+        /// data.
+        /// </summary>
+        /// <param name="main">The main storage to shadow.</param>
+        /// <param name="shadow">The storage that will shadow the main storage.</param>
+        /// <returns>
+        /// An <see cref="IStorage"/> which makes sure that all the operations performed on the <paramref name="main"/> storage
+        /// also is performed on the <paramref name="shadow"/> storage.
+        /// </returns>
+        public static IStorage ShadowedBy(this IStorage main, IStorage shadow) => new ShadowedStorage(main, shadow, (operation, exception) => {});
 
         /// <summary>
         /// Moves the given <paramref name="fileInfo"/> located at the given <paramref name="storage"/> 
@@ -85,5 +104,40 @@ namespace Fileicsh.Abstraction.Extensions
         {
             return storage.CopyFileToAsync(fileInfo, tag, destination, tag);
         }
+
+        /// <summary>
+        /// Creates the given <paramref name="file"/> and associates
+        /// the file with the given <paramref name="tag"/> synchronously.
+        /// </summary>
+        /// <param name="storage">The storage to create the file at.</param>
+        /// <param name="file">The file to create.</param>
+        /// <param name="tag">The tag to associate the file with.</param>
+        /// <returns>
+        /// A flag indicating whether the file was successfully created or not.
+        /// </returns>
+        public static bool CreateFile(this IStorage storage, IFile file, string tag) =>
+            AsyncHelpers.RunSync(() => storage.CreateFileAsync(file, tag));
+
+        /// <summary>
+        /// Deletes the file corresponding to the given <paramref name="file"/> associated
+        /// with the given <paramref name="tag"/> synchronously.
+        /// </summary>
+        /// <param name="storage">The storage to delete the file from.</param>
+        /// <param name="file">The file to delete.</param>
+        /// <param name="tag">The tag the file is currently associated with.</param>
+        /// <returns>
+        /// A flag indicating whether the file was successfully deleted or not.
+        /// </returns>
+        public static bool DeleteFile(this IStorage storage, IFileInfo file, string tag) => AsyncHelpers
+            .RunSync(() => storage.DeleteFileAsync(file, tag));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storage"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static bool DeleteTag(this IStorage storage, string tag) => AsyncHelpers
+            .RunSync(() => storage.DeleteTagAsync(tag));
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Fileicsh.Abstraction.Extensions;
+using Fileicsh.Abstraction.Helpers;
 
 namespace Fileicsh.Abstraction
 {
@@ -13,28 +14,6 @@ namespace Fileicsh.Abstraction
     /// </summary>
     public class MemoryStorage : IStorage
     {
-        private sealed class FileEqualityComparer : IEqualityComparer<IFileInfo>
-        {
-            public bool Equals(IFileInfo x, IFileInfo y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return string.Equals(x.FileName, y.FileName);
-            }
-
-            public int GetHashCode(IFileInfo obj)
-            {
-                unchecked
-                {
-                    return (obj.FileName.GetHashCode() * 397);
-                }
-            }
-        }
-
-        private static readonly IEqualityComparer<IFileInfo> FileComparer = new FileEqualityComparer();
-
         private readonly IDictionary<string, ISet<IFile>> _files = new Dictionary<string, ISet<IFile>>();
 
         /// <summary>
@@ -56,7 +35,7 @@ namespace Fileicsh.Abstraction
             tag = tag ?? string.Empty;
             if (!_files.TryGetValue(tag, out var files))
             {
-                files = new HashSet<IFile>(FileComparer);
+                files = new HashSet<IFile>(FileHelpers.FileComparer);
                 _files.Add(tag, files);
             }
 
