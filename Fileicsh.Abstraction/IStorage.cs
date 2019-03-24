@@ -22,7 +22,7 @@ namespace Fileicsh.Abstraction
     public interface IStorage : IDisposable
     {
         /// <summary>
-        /// Returns a list of unique tags located at the storage.
+        /// Returns a list of zero or more unique tags located at the storage.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the retrieved tags.</returns>

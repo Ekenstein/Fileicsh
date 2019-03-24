@@ -1,4 +1,6 @@
-﻿using System.Security;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Security;
 using System.Threading.Tasks;
 using Fileicsh.Abstraction.Helpers;
 
@@ -145,12 +147,49 @@ namespace Fileicsh.Abstraction.Extensions
             .RunSync(() => storage.DeleteFileAsync(file, tag));
 
         /// <summary>
-        /// 
+        /// Deletes the given <paramref name="tag"/> from the given <paramref name="storage"/>
+        /// synchronously.
         /// </summary>
-        /// <param name="storage"></param>
-        /// <param name="tag"></param>
-        /// <returns></returns>
+        /// <param name="storage">The storage to delete the tag from.</param>
+        /// <param name="tag">The tag to delete.</param>
+        /// <returns>
+        /// A flag indicating whether the tag was successfully deleted or not.
+        /// </returns>
         public static bool DeleteTag(this IStorage storage, string tag) => AsyncHelpers
             .RunSync(() => storage.DeleteTagAsync(tag));
+
+        /// <summary>
+        /// Re-associates the given <paramref name="file"/>, currently associated with the given <paramref name="tag"/>,
+        /// with the <paramref name="destinationTag"/>, synchronously.
+        /// </summary>
+        /// <param name="storage">The storage the file is located at.</param>
+        /// <param name="file">The file to re-associate with a new tag.</param>
+        /// <param name="tag">The tag the file is currently associated with.</param>
+        /// <param name="destinationTag">The tag that the file should be re-associated with.</param>
+        public static void MoveFile(this IStorage storage, IFileInfo file, string tag, string destinationTag) => AsyncHelpers
+            .RunSync(() => storage.MoveFileAsync(file, tag, destinationTag));
+
+        /// <summary>
+        /// Returns the file corresponding to the given <paramref name="file"/> from the
+        /// given <paramref name="storage"/>, synchronously.
+        /// </summary>
+        /// <param name="storage">The storage the file is located at.</param>
+        /// <param name="file">The file to retrieve.</param>
+        /// <param name="tag">The tag the file is associated with.</param>
+        /// <returns>
+        /// The corresponding file or null if the file couldn't be found.
+        /// </returns>
+        public static IFile GetFile(this IStorage storage, IFileInfo file, string tag) => AsyncHelpers
+            .RunSync(() => storage.GetFileAsync(file, tag));
+
+        /// <summary>
+        /// Returns all the tags located at the given <paramref name="storage"/>, synchronously.
+        /// </summary>
+        /// <param name="storage">The storage to retrieve all the tags from.</param>
+        /// <returns>
+        /// An <see cref="IReadOnlyList{T}"/> of zero or more tags.
+        /// </returns>
+        public static IReadOnlyList<string> GetTags(this IStorage storage) => AsyncHelpers
+            .RunSync(() => storage.GetTagsAsync());
     }
 }
