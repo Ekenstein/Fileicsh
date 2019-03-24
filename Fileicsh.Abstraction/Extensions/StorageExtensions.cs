@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security;
+using System.Threading.Tasks;
 using Fileicsh.Abstraction.Helpers;
 
 namespace Fileicsh.Abstraction.Extensions
@@ -34,6 +35,18 @@ namespace Fileicsh.Abstraction.Extensions
         /// also is performed on the <paramref name="shadow"/> storage.
         /// </returns>
         public static IStorage ShadowedBy(this IStorage main, IStorage shadow) => new ShadowedStorage(main, shadow, (operation, exception) => {});
+
+        /// <summary>
+        /// Returns a new storage that will permission check the given <paramref name="storage"/>
+        /// at each operation performed. If an operation has insufficient permissions, an <see cref="SecurityException"/>
+        /// will be thrown.
+        /// </summary>
+        /// <param name="storage">The storage to set permissions on.</param>
+        /// <param name="permissions">The permissions the storage will have.</param>
+        /// <returns>
+        /// An <see cref="IStorage"/> that will permission guard each operation made against the underlying <paramref name="storage"/>.
+        /// </returns>
+        public static IStorage SetPermissions(this IStorage storage, PermissionedStorage.Permission permissions) => new PermissionedStorage(storage, permissions);
 
         /// <summary>
         /// Moves the given <paramref name="fileInfo"/> located at the given <paramref name="storage"/> 

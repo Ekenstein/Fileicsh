@@ -120,7 +120,6 @@ namespace Fileicsh.Abstraction
         /// <summary>
         /// Creates a shadowed storage for the given <paramref name="main"/> storage
         /// where the given <paramref name="shadow"/> storage will copy all the operations made.
-        /// storage.
         /// </summary>
         /// <param name="main">The main storage.</param>
         /// <param name="shadow">The shadow storage that will perform the same operations as the main.</param>
