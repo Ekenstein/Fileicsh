@@ -32,17 +32,25 @@ namespace Fileicsh.Abstraction
             _rootPath = rootPath;
         }
 
-        private string GetTagPath(string tag) => Path.Combine(_rootPath, Uri.EscapeDataString(tag));
-        private string GetFilePath(string tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
+        private string GetTagPath(AlphaNumericString tag) => Path.Combine(_rootPath, tag);
+        private string GetFilePath(AlphaNumericString tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
 
-        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (file == null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
 
-            using (var fs = File.OpenWrite(GetFilePath(tag, file)))
+            var tagPath = GetTagPath(tag);
+            if (!Directory.Exists(tagPath))
+            {
+                Directory.CreateDirectory(tagPath);
+            }
+
+            var filePath = GetFilePath(tag, file);
+
+            using (var fs = File.Open(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fs, cancellationToken);
                 await fs.FlushAsync(cancellationToken);
@@ -51,7 +59,7 @@ namespace Fileicsh.Abstraction
             return true;
         }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var filePath = GetFilePath(tag, file);
             if (!File.Exists(filePath))
@@ -60,10 +68,19 @@ namespace Fileicsh.Abstraction
             }
 
             File.Delete(filePath);
+
+            var tagPath = GetTagPath(tag);
+            if (tag != AlphaNumericString.Empty && 
+                !Directory.GetFiles(tagPath).Any() && 
+                !Directory.GetDirectories(tagPath).Any())
+            {
+                Directory.Delete(tagPath);
+            }
+
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var path = GetTagPath(tag);
             if (!Directory.Exists(path))
@@ -71,7 +88,17 @@ namespace Fileicsh.Abstraction
                 return Task.FromResult(false);
             }
 
-            Directory.Delete(path, true);
+            var filesInTag = Directory.GetFiles(path);
+            foreach (var file in filesInTag)
+            {
+                File.Delete(file);
+            }
+
+            if (tag != AlphaNumericString.Empty)
+            {
+                Directory.Delete(path);
+            }
+
             return Task.FromResult(true);
         }
 
@@ -79,7 +106,7 @@ namespace Fileicsh.Abstraction
         {
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             var filePath = GetFilePath(tag, fileInfo);
             if (!File.Exists(filePath))
@@ -91,7 +118,7 @@ namespace Fileicsh.Abstraction
             return Task.FromResult<IFile>(file);
         }
 
-        public IAsyncEnumerable<IFile> GetFiles(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag)
         {
             var tagPath = GetTagPath(tag);
             if (!Directory.Exists(tagPath))
@@ -99,30 +126,52 @@ namespace Fileicsh.Abstraction
                 return AsyncEnumerable.Empty<IFile>();
             }
 
-            var files = Directory.GetFiles(tagPath)
+            return Directory.GetFiles(tagPath)
                 .Select(path => new FileSystemFile(path))
-                .Cast<IFile>();
-
-            return files.ToAsyncEnumerable();
+                .Cast<IFile>()
+                .ToAsyncEnumerable();
         }
 
-        public Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public IAsyncEnumerable<AlphaNumericString> GetTags()
         {
             var directories = Directory
                 .GetDirectories(_rootPath)
-                .Select(Uri.UnescapeDataString)
-                .Union(new [] { string.Empty })
-                .ToArray();
-            return Task.FromResult<IReadOnlyList<string>>(directories);
+                .Where(p => Directory.GetFiles(p).Any())
+                .Select(Path.GetFileName)
+                .Select(s => new AlphaNumericString(s));
+
+            if (Directory.GetFiles(_rootPath).Any())
+            {
+                directories = directories.Concat(new[] { AlphaNumericString.Empty});
+            }
+
+            return directories.ToAsyncEnumerable();
         }
 
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
+            var destinationTagPath = GetTagPath(destinationTag);
+
+            if (!Directory.Exists(destinationTagPath))
+            {
+                Directory.CreateDirectory(destinationTagPath);
+            }
+
             var filePath = GetFilePath(tag, file);
             var destinationPath = GetFilePath(destinationTag, file);
-
             File.Move(filePath, destinationPath);
-            return Task.FromResult(0);
+
+            if (tag != string.Empty)
+            {
+                var tagPath = GetTagPath(tag);
+                if (!Directory.GetDirectories(tagPath).Any() &&
+                    !Directory.GetFiles(tagPath).Any())
+                {
+                    Directory.Delete(tagPath);
+                }
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Async;
 using System.Collections.Generic;
 using System.Security;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="storage">The storage to prefix.</param>
         /// <param name="prefix">The prefix.</param>
         /// <returns>A prefixed storage which will add the given <paramref name="prefix"/> to the tags.</returns>
-        public static IStorage PrefixWith(this IStorage storage, string prefix)
+        public static IStorage PrefixWith(this IStorage storage, AlphaNumericString prefix)
         {
             return new PrefixedStorage(storage, prefix);
         }
@@ -61,7 +62,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="tag">The tag the file is currently associated with.</param>
         /// <param name="destination">The storage the file will be moved to.</param>
         /// <param name="destinationTag">The tag the file should be associated with at the destination storage.</param>
-        public static async Task MoveFileAsync(this IStorage storage, IFileInfo fileInfo, string tag, IStorage destination, string destinationTag)
+        public static async Task MoveFileAsync(this IStorage storage, IFileInfo fileInfo, AlphaNumericString tag, IStorage destination, AlphaNumericString destinationTag)
         {
             var file = await storage.GetFileAsync(fileInfo, tag);
             if (file == null)
@@ -82,7 +83,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="fileInfo">The file that should be moved.</param>
         /// <param name="tag">The tag the file is currently associated with and should be associated with at the destination storage.</param>
         /// <param name="destination">The storage the file will be moved to.</param>
-        public static Task MoveFileAsync(this IStorage storage, IFileInfo fileInfo, string tag, IStorage destination)
+        public static Task MoveFileAsync(this IStorage storage, IFileInfo fileInfo, AlphaNumericString tag, IStorage destination)
         {
             return storage.MoveFileAsync(fileInfo, tag, destination, tag);
         }
@@ -96,7 +97,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="tag">The tag the file is currently associated with.</param>
         /// <param name="destination">The storage the file will be copied to.</param>
         /// <param name="destinationTag">The tag the file will be associated with.</param>
-        public static async Task CopyFileToAsync(this IStorage storage, IFileInfo fileInfo, string tag, IStorage destination, string destinationTag)
+        public static async Task CopyFileToAsync(this IStorage storage, IFileInfo fileInfo, AlphaNumericString tag, IStorage destination, AlphaNumericString destinationTag)
         {
             var file = await storage.GetFileAsync(fileInfo, tag);
             if (file == null)
@@ -115,7 +116,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="fileInfo">The file that should be moved.</param>
         /// <param name="tag">The tag the file is currently associated with and will be associated with at the destination storage.</param>
         /// <param name="destination">The storage the file will be copied to.</param>
-        public static Task CopyFileToAsync(this IStorage storage, IFileInfo fileInfo, string tag, IStorage destination)
+        public static Task CopyFileToAsync(this IStorage storage, IFileInfo fileInfo, AlphaNumericString tag, IStorage destination)
         {
             return storage.CopyFileToAsync(fileInfo, tag, destination, tag);
         }
@@ -130,7 +131,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <returns>
         /// A flag indicating whether the file was successfully created or not.
         /// </returns>
-        public static bool CreateFile(this IStorage storage, IFile file, string tag) =>
+        public static bool CreateFile(this IStorage storage, IFile file, AlphaNumericString tag) =>
             AsyncHelpers.RunSync(() => storage.CreateFileAsync(file, tag));
 
         /// <summary>
@@ -143,7 +144,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <returns>
         /// A flag indicating whether the file was successfully deleted or not.
         /// </returns>
-        public static bool DeleteFile(this IStorage storage, IFileInfo file, string tag) => AsyncHelpers
+        public static bool DeleteFile(this IStorage storage, IFileInfo file, AlphaNumericString tag) => AsyncHelpers
             .RunSync(() => storage.DeleteFileAsync(file, tag));
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <returns>
         /// A flag indicating whether the tag was successfully deleted or not.
         /// </returns>
-        public static bool DeleteTag(this IStorage storage, string tag) => AsyncHelpers
+        public static bool DeleteTag(this IStorage storage, AlphaNumericString tag) => AsyncHelpers
             .RunSync(() => storage.DeleteTagAsync(tag));
 
         /// <summary>
@@ -166,7 +167,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// <param name="file">The file to re-associate with a new tag.</param>
         /// <param name="tag">The tag the file is currently associated with.</param>
         /// <param name="destinationTag">The tag that the file should be re-associated with.</param>
-        public static void MoveFile(this IStorage storage, IFileInfo file, string tag, string destinationTag) => AsyncHelpers
+        public static void MoveFile(this IStorage storage, IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag) => AsyncHelpers
             .RunSync(() => storage.MoveFileAsync(file, tag, destinationTag));
 
         /// <summary>
@@ -179,17 +180,10 @@ namespace Fileicsh.Abstraction.Extensions
         /// <returns>
         /// The corresponding file or null if the file couldn't be found.
         /// </returns>
-        public static IFile GetFile(this IStorage storage, IFileInfo file, string tag) => AsyncHelpers
+        public static IFile GetFile(this IStorage storage, IFileInfo file, AlphaNumericString tag) => AsyncHelpers
             .RunSync(() => storage.GetFileAsync(file, tag));
 
-        /// <summary>
-        /// Returns all the tags located at the given <paramref name="storage"/>, synchronously.
-        /// </summary>
-        /// <param name="storage">The storage to retrieve all the tags from.</param>
-        /// <returns>
-        /// An <see cref="IReadOnlyList{T}"/> of zero or more tags.
-        /// </returns>
-        public static IReadOnlyList<string> GetTags(this IStorage storage) => AsyncHelpers
-            .RunSync(() => storage.GetTagsAsync());
+        public static IReadOnlyList<AlphaNumericString> GetAllTags(this IStorage storage) => AsyncHelpers
+            .RunSync(() => storage.GetTags().ToArrayAsync());
     }
 }

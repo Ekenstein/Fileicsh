@@ -42,13 +42,13 @@ namespace Fileicsh.SFTP
             RootDirectory = rootDirectory;
         }
 
-        private string GetTagPath(string tag)
+        private string GetTagPath(AlphaNumericString tag)
         {
-            return Path.Combine(RootDirectory, Uri.EscapeDataString(tag ?? string.Empty))
+            return Path.Combine(RootDirectory, tag)
                 .Replace("\\", "/");
         }
 
-        private string GetFilePath(IFileInfo fileInfo, string tag)
+        private string GetFilePath(IFileInfo fileInfo, AlphaNumericString tag)
         {
             return Path.Combine(GetTagPath(tag), fileInfo.FileName)
                 .Replace("\\", "/");
@@ -66,7 +66,7 @@ namespace Fileicsh.SFTP
         /// <returns>
         /// A flag indicating whether the file was successfully uploaded or not.
         /// </returns>
-        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -83,10 +83,6 @@ namespace Fileicsh.SFTP
             }
 
             var filePath = GetFilePath(file, tag);
-            if (_sftpClient.Exists(filePath))
-            {
-                _sftpClient.DeleteFile(filePath);
-            }
 
             using (var stream = await file.OpenReadStreamAsync(cancellationToken))
             {
@@ -96,7 +92,7 @@ namespace Fileicsh.SFTP
             return true;
         }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -107,22 +103,50 @@ namespace Fileicsh.SFTP
             cancellationToken.ThrowIfCancellationRequested();
             if (!_sftpClient.Exists(filePath))
             {
-                return Task.FromResult(false);
+                return false;
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             _sftpClient.DeleteFile(filePath);
-            return Task.FromResult(true);
+
+            if (tag != string.Empty)
+            {
+                var tagPath = GetTagPath(tag);
+                var filesInTag = await _sftpClient.ListDirectoryAsync(GetTagPath(tag), cancellationToken);
+                if (!filesInTag.Any(f => f.Name != ".." && f.Name != "."))
+                {
+                    _sftpClient.DeleteDirectory(tagPath);
+                }
+            }
+
+            return true;
         }
 
-        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
             
             var path = GetTagPath(tag);
-            return _sftpClient.DeleteDirectoryAsync(path, true, cancellationToken);
+            if (!_sftpClient.Exists(path))
+            {
+                return false;
+            }
+
+            var files = await _sftpClient.ListDirectoryAsync(path, cancellationToken);
+            foreach (var file in files.Where(f => f.IsRegularFile))
+            {
+                file.Delete();
+            }
+
+            if (!files.Any(f => f.IsDirectory()) && 
+                tag != string.Empty)
+            {
+                _sftpClient.DeleteDirectory(path);
+            }
+
+            return true;
         }
 
         public void Dispose()
@@ -152,7 +176,7 @@ namespace Fileicsh.SFTP
             }
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -171,7 +195,7 @@ namespace Fileicsh.SFTP
             return Task.FromResult<IFile>(new SftpRegularFile(_sftpClient.ConnectionInfo, file));
         }
 
-        public IAsyncEnumerable<IFile> GetFiles(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag)
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -184,7 +208,7 @@ namespace Fileicsh.SFTP
 
             return new AsyncEnumerable<IFile>(async yield =>
             {
-                var files = await _sftpClient.ListDirectoryAsync(tagPath);
+                var files = await _sftpClient.ListDirectoryAsync(tagPath, yield.CancellationToken);
                 
                 foreach (var file in files.Where(f => f.IsRegularFile))
                 {
@@ -193,22 +217,39 @@ namespace Fileicsh.SFTP
             });
         }
 
-        public async Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public IAsyncEnumerable<AlphaNumericString> GetTags()
         {
-            cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
             ConnectIfDisconnected();
 
-            var files = await _sftpClient.ListDirectoryAsync(RootDirectory, cancellationToken);
-            return files
-                .Where(f => f.IsDirectory)
-                .Where(f => f.Name != "." && f.Name != "..")
-                .Select(d => Uri.UnescapeDataString(d.Name))
-                .Union(new[] { string.Empty })
-                .ToArray();
+            return new AsyncEnumerable<AlphaNumericString>(async yield =>
+            {
+                ThrowIfDisposed();
+                ConnectIfDisconnected();
+
+                var rootFiles = await _sftpClient.ListDirectoryAsync(RootDirectory, yield.CancellationToken);
+                var directories = rootFiles
+                    .Where(f => f.IsDirectory());
+
+                foreach (var directory in directories)
+                {
+                    ThrowIfDisposed();
+                    ConnectIfDisconnected();
+                    var files = await _sftpClient.ListDirectoryAsync(directory.FullName, yield.CancellationToken);
+                    if (files.Any(f => f.IsRegularFile))
+                    {
+                        await yield.ReturnAsync(new AlphaNumericString(directory.Name));
+                    }
+                }
+
+                if (rootFiles.Any(f => f.IsRegularFile))
+                {
+                    await yield.ReturnAsync(AlphaNumericString.Empty);
+                }
+            });
         }
 
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();

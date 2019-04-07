@@ -228,7 +228,7 @@ namespace Fileicsh.Abstraction.Extensions
         /// </summary>
         /// <param name="file">The file to produce an SHA256 hash of.</param>
         /// <returns>A byte array representing the SHA256 hash of the file.</returns>
-        public static Task<byte[]> GetSHA256(this IFile file)
+        public static Task<byte[]> GetSHA256Async(this IFile file)
         {
             return file.ToSHA256().GetHashAsync();
         }

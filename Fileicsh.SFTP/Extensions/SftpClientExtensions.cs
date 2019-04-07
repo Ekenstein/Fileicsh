@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Renci.SshNet;
@@ -94,129 +93,6 @@ namespace Fileicsh.Extensions
                 result => client.EndUploadFile(result));
         }
 
-        /// <summary>
-        /// Deletes the directory at the given <paramref name="path"/> asynchronously.
-        /// </summary>
-        /// <param name="client">The SFTP client to perform the delete action with.</param>
-        /// <param name="path">The path to the directory to delete.</param>
-        /// <param name="recursive">Whether all files in the directory should be deleted or not.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
-        /// <returns>A <see cref="Task{TResult}"/> containing a flag indicating whether the directory was successfully deleted or not.</returns>
-        public static async Task<bool> DeleteDirectoryAsync(this SftpClient client, string path, bool recursive, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentException("Path must not be null or white space.");
-            }
-
-            if (!client.Exists(path))
-            {
-                return false;
-            }
-
-            if (recursive)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var file = client.Get(path);
-
-                cancellationToken.ThrowIfCancellationRequested();
-                await DeleteDirectoryRecursiveAsync(client, file);
-            }
-            else
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var files = await client.ListDirectoryAsync(path);
-                if (files.Any(f => f.Name != "." || f.Name != ".."))
-                {
-                    return false;
-                }
-
-                cancellationToken.ThrowIfCancellationRequested();
-                client.DeleteDirectory(path);
-            }
-
-            return true;
-        }
-
-        public static bool DeleteDirectory(this SftpClient client, string path, bool recursive)
-        {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentException("Path must not be null or white space.");
-            }
-
-            if (!client.Exists(path))
-            {
-                return false;
-            }
-
-            if (recursive)
-            {
-                var file = client.Get(path);
-                DeleteDirectoryRecursive(client, file);
-            }
-            else
-            {
-                var files = client.ListDirectory(path);
-                if (files.Any(f => f.Name != "." || f.Name != ".."))
-                {
-                    return false;
-                }
-
-                client.DeleteDirectory(path);
-            }
-
-            return true;
-        }
-
-        private static async Task DeleteDirectoryRecursiveAsync(SftpClient client, SftpFile file)
-        {
-            if (file.Name == "." || file.Name == "..")
-            {
-                return;
-            }
-
-            if (file.IsDirectory)
-            {
-                var directoryFiles = await client.ListDirectoryAsync(file.FullName);
-                foreach (var directoryFile in directoryFiles)
-                {
-                    await DeleteDirectoryRecursiveAsync(client, directoryFile);
-                }
-            }
-
-            client.Delete(file.FullName);
-        }
-
-        private static void DeleteDirectoryRecursive(SftpClient client, SftpFile file)
-        {
-            if (file.Name == "." || file.Name == "..")
-            {
-                return;
-            }
-
-            if (file.IsDirectory)
-            {
-                var directoryFiles = client.ListDirectory(file.FullName);
-                foreach (var directoryFile in directoryFiles)
-                {
-                    DeleteDirectoryRecursive(client, directoryFile);
-                }
-            }
-
-            client.Delete(file.FullName);
-        }
+        public static bool IsDirectory(this SftpFile file) => file.IsDirectory && file.Name != ".." && file.Name != ".";
     }
 }

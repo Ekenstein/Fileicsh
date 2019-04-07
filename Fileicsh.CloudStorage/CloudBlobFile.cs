@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Fileicsh.Abstraction;
 using HeyRed.Mime;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage.Blob;
 
 namespace Fileicsh.CloudStorage
 {

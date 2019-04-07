@@ -48,6 +48,7 @@ namespace Fileicsh.Abstraction
             _hashAlgorithm.Initialize();
             await _file.CopyToAsync(cryptoStream, cancellationToken);
             await cryptoStream.FlushAsync(cancellationToken);
+            cryptoStream.FlushFinalBlock();
             _hash = _hashAlgorithm.Hash;
         }
 

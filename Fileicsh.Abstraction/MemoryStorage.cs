@@ -14,7 +14,7 @@ namespace Fileicsh.Abstraction
     /// </summary>
     public class MemoryStorage : IStorage
     {
-        private readonly IDictionary<string, ISet<IFile>> _files = new Dictionary<string, ISet<IFile>>();
+        private readonly IDictionary<AlphaNumericString, ISet<IFile>> _files = new Dictionary<AlphaNumericString, ISet<IFile>>();
 
         /// <summary>
         /// Saves the file in memory and associates the file with the given <paramref name="tag"/>.
@@ -25,14 +25,13 @@ namespace Fileicsh.Abstraction
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public async Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (file == null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
 
-            tag = tag ?? string.Empty;
             if (!_files.TryGetValue(tag, out var files))
             {
                 files = new HashSet<IFile>(FileHelpers.FileComparer);
@@ -60,7 +59,7 @@ namespace Fileicsh.Abstraction
         /// and <paramref name="tag"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -68,8 +67,6 @@ namespace Fileicsh.Abstraction
             {
                 throw new ArgumentNullException(nameof(file));
             }
-
-            tag = tag ?? string.Empty;
 
             if (!_files.TryGetValue(tag, out var files))
             {
@@ -95,11 +92,14 @@ namespace Fileicsh.Abstraction
         /// True if the tag and all its underlying files were successfully deleted, otherwise false if there was
         /// no tag corresponding to the given <paramref name="tag"/>.
         /// </returns>
-        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            tag = tag ?? string.Empty;
 
+            if (_files.TryGetValue(tag, out var files))
+            {
+                files.Clear();
+            }
             return Task.FromResult(_files.Remove(tag));
         }
 
@@ -122,7 +122,7 @@ namespace Fileicsh.Abstraction
         /// If no such file exists, the <see cref="Task{TResult}"/> will contain null.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="fileInfo"/> is null.</exception>
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (fileInfo == null)
@@ -130,7 +130,6 @@ namespace Fileicsh.Abstraction
                 throw new ArgumentNullException(nameof(fileInfo));
             }
 
-            tag = tag ?? string.Empty;
             var file = _files.TryGetValue(tag, out var files)
                 ? files.FirstOrDefault(f => f.FileName == fileInfo.FileName)
                 : null;
@@ -146,9 +145,8 @@ namespace Fileicsh.Abstraction
         /// An <see cref="IAsyncEnumerable{T}"/> containing the zero or more files associated with the
         /// given <paramref name="tag"/>.
         /// </returns>
-        public IAsyncEnumerable<IFile> GetFiles(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag)
         {
-            tag = tag ?? string.Empty;
             return _files.TryGetValue(tag, out var files)
                 ? files.ToAsyncEnumerable()
                 : AsyncEnumerable<IFile>.Empty;
@@ -156,17 +154,16 @@ namespace Fileicsh.Abstraction
 
         /// <summary>
         /// Returns all the tags associated with this memory storage.
-        /// <see cref="string.Empty"/> will always be included amongst the tags.
         /// </summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> containing a <see cref="IReadOnlyList{T}"/> of tags associated with this memory storage.
+        /// An <see cref="IAsyncEnumerable{T}"/> containing the 
         /// </returns>
-        public Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public IAsyncEnumerable<AlphaNumericString> GetTags()
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var tags = _files.Keys.Union(new [] {string.Empty}).ToArray();
-            return Task.FromResult<IReadOnlyList<string>>(tags);
+            return _files
+                .Where(f => f.Value.Any())
+                .Select(f => f.Key)
+                .ToAsyncEnumerable();
         }
 
         /// <summary>
@@ -182,16 +179,13 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public async Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (file == null)
             {
                 throw new ArgumentNullException(nameof(file));
             }
-
-            tag = tag ?? string.Empty;
-            destinationTag = destinationTag ?? string.Empty;
 
             if (tag == destinationTag)
             {

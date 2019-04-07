@@ -1,5 +1,4 @@
 ﻿using System.Collections.Async;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +18,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task<bool> CreateFileAsync(IFile file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(false);
         }
@@ -34,7 +33,7 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation, that will
         /// always contain false.
         /// </returns>
-        public Task<bool> DeleteFileAsync(IFileInfo file, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(false);
         }
@@ -48,7 +47,7 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation, that will always
         /// return false.
         /// </returns>
-        public Task<bool> DeleteTagAsync(string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(false);
         }
@@ -69,7 +68,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task{TResult}"/> representing the asynchronous operation, that will always contain null.
         /// </returns>
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, string tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult<IFile>(null);
         }
@@ -82,7 +81,7 @@ namespace Fileicsh.Abstraction
         /// An <see cref="IAsyncEnumerable{T}"/> of <see cref="IFile"/> that will
         /// always return zero elements.
         /// </returns>
-        public IAsyncEnumerable<IFile> GetFiles(string tag)
+        public IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag)
         {
             return AsyncEnumerable<IFile>.Empty;
         }
@@ -90,14 +89,12 @@ namespace Fileicsh.Abstraction
         /// <summary>
         /// Will always return an empty collection of tags.
         /// </summary>
-        /// <param name="cancellationToken">The cancellation token that has nothing to say.</param>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, that will always return
-        /// an empty collection of tags.
+        /// An empty <see cref="IAsyncEnumerable{T}"/>.
         /// </returns>
-        public Task<IReadOnlyList<string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public IAsyncEnumerable<AlphaNumericString> GetTags()
         {
-            return Task.FromResult<IReadOnlyList<string>>(new string[0]);
+            return AsyncEnumerable<AlphaNumericString>.Empty;
         }
 
         /// <summary>
@@ -110,7 +107,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task MoveFileAsync(IFileInfo file, string tag, string destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult(0);
         }

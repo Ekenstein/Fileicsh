@@ -1,15 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\paket-files\Ekenstein\Rngers\Rngers\RandomExtensions.cs">
-      <Paket>True</Paket>
-      <Link>paket-files/RandomExtensions.cs</Link>
-    </Compile>
     <ProjectReference Include="..\Fileicsh.SFTP\Fileicsh.SFTP.csproj" />
+    <ProjectReference Include="..\Fileicsh.Tests\Fileicsh.Tests.csproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
