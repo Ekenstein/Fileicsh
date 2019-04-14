@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.SFTP.Tests", "File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.Tests", "Fileicsh.Tests\Fileicsh.Tests.csproj", "{4E977144-897B-4937-BB53-EB1374FC1FE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileicsh.CloudStorage.Tests", "Fileicsh.CloudStorage.Tests\Fileicsh.CloudStorage.Tests.csproj", "{E5D60AAF-C991-41D1-99EC-87FA70555507}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.CloudStorage.Tests", "Fileicsh.CloudStorage.Tests\Fileicsh.CloudStorage.Tests.csproj", "{E5D60AAF-C991-41D1-99EC-87FA70555507}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.Crypto", "Fileicsh.Crypto\Fileicsh.Crypto.csproj", "{827EEC06-C0C4-4069-994F-B0273AFAF61C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileicsh.Crypto.Tests", "Fileicsh.Crypto.Tests\Fileicsh.Crypto.Tests.csproj", "{33335F84-8962-4138-970F-55E8F39873A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{E5D60AAF-C991-41D1-99EC-87FA70555507}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5D60AAF-C991-41D1-99EC-87FA70555507}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5D60AAF-C991-41D1-99EC-87FA70555507}.Release|Any CPU.Build.0 = Release|Any CPU
+		{827EEC06-C0C4-4069-994F-B0273AFAF61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{827EEC06-C0C4-4069-994F-B0273AFAF61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{827EEC06-C0C4-4069-994F-B0273AFAF61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{827EEC06-C0C4-4069-994F-B0273AFAF61C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33335F84-8962-4138-970F-55E8F39873A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33335F84-8962-4138-970F-55E8F39873A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33335F84-8962-4138-970F-55E8F39873A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33335F84-8962-4138-970F-55E8F39873A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
