@@ -100,10 +100,10 @@ namespace Fileicsh.Crypto
 
         public virtual IAsyncEnumerable<AlphaNumericString> GetTags() => Storage.GetTags();
 
-        public virtual Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken)) => Storage
+        public virtual Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default) => Storage
             .GetFileAsync(file, tag, cancellationToken);
 
-        public virtual Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (file == null)
@@ -128,19 +128,19 @@ namespace Fileicsh.Crypto
             return Storage.CreateFileAsync(pgpFile, tag, cancellationToken);
         }
 
-        public virtual Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Storage.DeleteFileAsync(file, tag, cancellationToken);
         }
 
-        public virtual Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Storage.DeleteTagAsync(tag, cancellationToken);
         }
 
         public virtual IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag) => Storage.GetFiles(tag);
 
-        public virtual Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             return Storage.MoveFileAsync(file, tag, destinationTag, cancellationToken);
         }

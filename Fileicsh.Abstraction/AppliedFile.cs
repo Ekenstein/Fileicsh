@@ -56,11 +56,11 @@ namespace Fileicsh.Abstraction
         {
         }
 
-        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken)) => _file
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default) => _file
             .CopyToAsync(outputStream, cancellationToken);
 
         public void Dispose() => _file.Dispose();
 
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default) => _file.OpenReadStreamAsync(cancellationToken);
     }
 }

@@ -21,14 +21,14 @@ namespace Fileicsh.CloudStorage
 
         public string ContentType => _cloudBlob.Properties?.ContentType ?? MimeTypesMap.GetMimeType(FileName);
 
-        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken)) => _cloudBlob
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default) => _cloudBlob
             .DownloadToStreamAsync(outputStream, cancellationToken);
 
         public void Dispose()
         {
         }
 
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _cloudBlob
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default) => _cloudBlob
             .OpenReadAsync(cancellationToken);
     }
 }

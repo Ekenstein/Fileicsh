@@ -92,7 +92,7 @@ namespace Fileicsh.Crypto
         /// </summary>
         public string ContentType => _file.ContentType;
 
-        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
         {
             using (var inputStream = await _file.OpenReadStreamAsync(cancellationToken))
             using (var decoderStream = PgpUtilities.GetDecoderStream(inputStream))
@@ -171,7 +171,7 @@ namespace Fileicsh.Crypto
         /// </summary>
         public void Dispose() => _file.Dispose();
 
-        public async Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default)
         {
             var ms = new MemoryStream();
             await CopyToAsync(ms, cancellationToken);

@@ -42,7 +42,7 @@ namespace Fileicsh.Abstraction
             HashAlgorithm = hashAlgorithmName;
         }
 
-        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
         {
             var cryptoStream = new CryptoStream(outputStream, _hashAlgorithm, CryptoStreamMode.Write);
             _hashAlgorithm.Initialize();
@@ -64,6 +64,6 @@ namespace Fileicsh.Abstraction
             return _hash;
         }
 
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file.OpenReadStreamAsync(cancellationToken);
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default) => _file.OpenReadStreamAsync(cancellationToken);
     }
 }

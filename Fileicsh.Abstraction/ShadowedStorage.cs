@@ -205,7 +205,7 @@ namespace Fileicsh.Abstraction
         /// exist in the main storage, the file will be queried at the shadow storage, iff <see cref="Operations"/>
         /// is flagged with <see cref="ShadowedOperation.GetFile"/>.
         /// </returns>
-        public async Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -237,7 +237,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the file was successfully created at the main storage.
         /// </returns>
-        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -270,7 +270,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the file was successfully deleted or not at the main storage.
         /// </returns>
-        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -302,7 +302,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the tag was successfully deleted at the main storage or not.
         /// </returns>
-        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -362,7 +362,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();

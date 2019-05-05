@@ -18,7 +18,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(false);
         }
@@ -33,7 +33,7 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation, that will
         /// always contain false.
         /// </returns>
-        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(false);
         }
@@ -47,7 +47,7 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation, that will always
         /// return false.
         /// </returns>
-        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(false);
         }
@@ -68,7 +68,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task{TResult}"/> representing the asynchronous operation, that will always contain null.
         /// </returns>
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IFile>(null);
         }
@@ -107,7 +107,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(0);
         }

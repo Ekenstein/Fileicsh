@@ -35,7 +35,7 @@ namespace Fileicsh.Abstraction
         private string GetTagPath(AlphaNumericString tag) => Path.Combine(_rootPath, tag);
         private string GetFilePath(AlphaNumericString tag, IFileInfo file) => Path.Combine(GetTagPath(tag), file.FileName);
 
-        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             if (file == null)
             {
@@ -59,7 +59,7 @@ namespace Fileicsh.Abstraction
             return true;
         }
 
-        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var filePath = GetFilePath(tag, file);
             if (!File.Exists(filePath))
@@ -80,7 +80,7 @@ namespace Fileicsh.Abstraction
             return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var path = GetTagPath(tag);
             if (!Directory.Exists(path))
@@ -106,7 +106,7 @@ namespace Fileicsh.Abstraction
         {
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var filePath = GetFilePath(tag, fileInfo);
             if (!File.Exists(filePath))
@@ -148,7 +148,7 @@ namespace Fileicsh.Abstraction
             return directories.ToAsyncEnumerable();
         }
 
-        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             var destinationTagPath = GetTagPath(destinationTag);
 

@@ -25,7 +25,7 @@ namespace Fileicsh.Abstraction
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             if (file == null)
             {
@@ -59,7 +59,7 @@ namespace Fileicsh.Abstraction
         /// and <paramref name="tag"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -92,7 +92,7 @@ namespace Fileicsh.Abstraction
         /// True if the tag and all its underlying files were successfully deleted, otherwise false if there was
         /// no tag corresponding to the given <paramref name="tag"/>.
         /// </returns>
-        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -122,7 +122,7 @@ namespace Fileicsh.Abstraction
         /// If no such file exists, the <see cref="Task{TResult}"/> will contain null.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="fileInfo"/> is null.</exception>
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (fileInfo == null)
@@ -179,7 +179,7 @@ namespace Fileicsh.Abstraction
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="file"/> is null.</exception>
-        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (file == null)

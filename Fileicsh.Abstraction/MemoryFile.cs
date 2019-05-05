@@ -51,7 +51,7 @@ namespace Fileicsh.Abstraction
         /// </returns>
         /// <exception cref="ArgumentNullException">If the given <paramref name="outputStream"/> is null.</exception>
         /// <exception cref="ObjectDisposedException">If the file is disposed.</exception>
-        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -93,7 +93,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task{TResult}"/> containing the readable stream of the underlying data.
         /// </returns>
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();

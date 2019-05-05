@@ -38,10 +38,10 @@ namespace Fileicsh.Abstraction
             _fileName = new Lazy<string>(() => RenameFile(fileName, keepExtension));
         }
 
-        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken)) => _file
+        public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default) => _file
             .CopyToAsync(outputStream);
 
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken)) => _file
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default) => _file
             .OpenReadStreamAsync(cancellationToken);
 
         private string RenameFile(string fileName, bool keepExtension) => keepExtension

@@ -54,7 +54,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the file was successfully created at the underlying storage or not.
         /// </returns>
-        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return _storage.CreateFileAsync(file, ToPrefixedTag(tag), cancellationToken);
         }
@@ -69,7 +69,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the file was successfully deleted from the underlying storage or not.
         /// </returns>
-        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return _storage.DeleteFileAsync(file, ToPrefixedTag(tag), cancellationToken);
         }
@@ -83,7 +83,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A flag indicating whether the tag was successfully deleted or not.
         /// </returns>
-        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return _storage.DeleteTagAsync(ToPrefixedTag(tag), cancellationToken);
         }
@@ -104,7 +104,7 @@ namespace Fileicsh.Abstraction
         /// The <see cref="IFile"/> from the underlying storage associated with the prefixed <paramref name="tag"/> or null,
         /// if there was no such file.
         /// </returns>
-        public Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             return _storage.GetFileAsync(file, ToPrefixedTag(tag), cancellationToken);
         }
@@ -144,7 +144,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             return _storage.MoveFileAsync(file, ToPrefixedTag(tag), ToPrefixedTag(destinationTag), cancellationToken);
         }

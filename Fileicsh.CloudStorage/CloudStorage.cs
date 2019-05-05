@@ -55,7 +55,7 @@ namespace Fileicsh.CloudStorage
             return _client.GetContainerReference(containerName);
         }
 
-        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var container = GetContainer(tag);
             await container.CreateIfNotExistsAsync(cancellationToken);
@@ -71,7 +71,7 @@ namespace Fileicsh.CloudStorage
             return true;
         }
 
-        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var container = GetContainer(tag);
             if (!await container.ExistsAsync(cancellationToken))
@@ -83,7 +83,7 @@ namespace Fileicsh.CloudStorage
             return await fileReference.DeleteIfExistsAsync(cancellationToken);
         }
 
-        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var container = GetContainer(tag);
             return await container.DeleteIfExistsAsync(cancellationToken);
@@ -93,7 +93,7 @@ namespace Fileicsh.CloudStorage
         {
         }
 
-        public async Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             var container = GetContainer(tag);
             if (!await container.ExistsAsync(cancellationToken))
@@ -157,7 +157,7 @@ namespace Fileicsh.CloudStorage
             });
         }
 
-        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             var container = GetContainer(tag);
             if (!await container.ExistsAsync(cancellationToken))

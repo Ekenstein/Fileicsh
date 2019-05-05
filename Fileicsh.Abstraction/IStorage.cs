@@ -36,7 +36,7 @@ namespace Fileicsh.Abstraction
         /// <param name="tag">The tag the file is associated with.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the retrieved file.</returns>
-        Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates the given <paramref name="file"/> and associates
@@ -50,7 +50,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// The <see cref="Task"/> that represents the asynchronous operation, containing
         /// a flag indicating whether the file was successfully created or not.</returns>
-        Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes the file corresponding to the given <paramref name="file"/> associated
@@ -61,7 +61,7 @@ namespace Fileicsh.Abstraction
         /// <param name="tag">The tag the file is associated with.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains a flag indicating the file could be successfully deleted or not.</returns>
-        Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes all the files associated with the given <paramref name="tag"/>.
@@ -69,7 +69,7 @@ namespace Fileicsh.Abstraction
         /// <param name="tag">The tag of the files to be removed.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains a flag indicating indicating whether all the files associated with the tag was successfully deleted or not.</returns>
-        Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a collection zero or more files associated with the given <paramref name="tag"/>.
@@ -88,6 +88,6 @@ namespace Fileicsh.Abstraction
         /// <param name="destinationTag">The new tag the file should be associated with.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken));
+        Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default);
     }
 }

@@ -28,7 +28,7 @@ namespace Fileicsh.Abstraction
             _filePath = filePath;
         }
 
-        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
         {
             using (var readStream = await OpenReadStreamAsync(cancellationToken))
             {
@@ -41,7 +41,7 @@ namespace Fileicsh.Abstraction
         {
         }
 
-        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult<Stream>(File.OpenRead(_filePath));

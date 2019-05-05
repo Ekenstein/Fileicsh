@@ -100,7 +100,7 @@ namespace Fileicsh.Abstraction
         /// the file corresponding to the given <paramref name="file"/>.
         /// </returns>
         /// <exception cref="SecurityException">If the storage doesn't have the permission <see cref="Permission.Read"/>.</exception>
-        public Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             ThrowIfNoPermission(Permission.Read);
             return _storage.GetFileAsync(file, tag, cancellationToken);
@@ -118,7 +118,7 @@ namespace Fileicsh.Abstraction
         /// a flag indicating whether the file was successfully created or not at the underlying storage.
         /// </returns>
         /// <exception cref="SecurityException">If the storage doesn't have the permission <see cref="Permission.Write"/>.</exception>
-        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             ThrowIfNoPermission(Permission.Write);
             return _storage.CreateFileAsync(file, tag, cancellationToken);
@@ -136,7 +136,7 @@ namespace Fileicsh.Abstraction
         ///  a flag indicating whether the file was successfully deleted or not.
         /// </returns>
         /// <exception cref="SecurityException">If the storage doesn't have the permission <see cref="Permission.Delete"/>.</exception>
-        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             ThrowIfNoPermission(Permission.Delete);
             return _storage.DeleteFileAsync(file, tag, cancellationToken);
@@ -153,7 +153,7 @@ namespace Fileicsh.Abstraction
         /// a flag indicating whether the tag was successfully deleted or not.
         /// </returns>
         /// <exception cref="SecurityException">If the storage doesn't have the permission <see cref="Permission.Delete"/>.</exception>
-        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             ThrowIfNoPermission(Permission.Delete);
             return _storage.DeleteTagAsync(tag, cancellationToken);
@@ -186,7 +186,7 @@ namespace Fileicsh.Abstraction
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             ThrowIfNoPermission(Permission.Move);
             return _storage.MoveFileAsync(file, tag, destinationTag, cancellationToken);

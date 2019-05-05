@@ -18,7 +18,7 @@ namespace Fileicsh.Extensions
         /// <param name="cancellationToken">Cancellation token </param>
         /// <returns></returns>
         public static Task<IEnumerable<SftpFile>> ListDirectoryAsync(this SftpClient client, string path,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             if (client == null)
             {
@@ -37,7 +37,7 @@ namespace Fileicsh.Extensions
                 result => client.EndListDirectory(result));
         }
 
-        public static Task DownloadToStreamAsync(this SftpClient client, string filePath, Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task DownloadToStreamAsync(this SftpClient client, string filePath, Stream outputStream, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (client == null)
@@ -69,7 +69,7 @@ namespace Fileicsh.Extensions
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="client"/> or <paramref name="inputStream"/> is null.</exception>
         /// <exception cref="ArgumentException">If <paramref name="path"/> is null or white space.</exception>
-        public static Task UploadFileAsync(this SftpClient client, string path, Stream inputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task UploadFileAsync(this SftpClient client, string path, Stream inputStream, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

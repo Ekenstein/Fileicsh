@@ -66,7 +66,7 @@ namespace Fileicsh.SFTP
         /// <returns>
         /// A flag indicating whether the file was successfully uploaded or not.
         /// </returns>
-        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             ConnectIfDisconnected();
@@ -92,7 +92,7 @@ namespace Fileicsh.SFTP
             return true;
         }
 
-        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -122,7 +122,7 @@ namespace Fileicsh.SFTP
             return true;
         }
 
-        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -176,7 +176,7 @@ namespace Fileicsh.SFTP
             }
         }
 
-        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> GetFileAsync(IFileInfo fileInfo, AlphaNumericString tag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -249,7 +249,7 @@ namespace Fileicsh.SFTP
             });
         }
 
-        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default(CancellationToken))
+        public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -308,7 +308,7 @@ namespace Fileicsh.SFTP
                 _file = file ?? throw new ArgumentNullException(nameof(file));
             }
 
-            public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+            public Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ThrowIfDisposed();
@@ -341,7 +341,7 @@ namespace Fileicsh.SFTP
                 }
             }
 
-            public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+            public Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ThrowIfDisposed();

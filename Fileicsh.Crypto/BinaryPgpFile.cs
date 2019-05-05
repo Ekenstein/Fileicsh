@@ -105,7 +105,7 @@ namespace Fileicsh.Crypto
             PublicKey = publicKey ?? throw new ArgumentNullException(nameof(publicKey));
         }
 
-        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task CopyToAsync(Stream outputStream, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -170,7 +170,7 @@ namespace Fileicsh.Crypto
             ? new ArmoredOutputStream(outputStream)
             : outputStream;
 
-        public async Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Stream> OpenReadStreamAsync(CancellationToken cancellationToken = default)
         {
             var tempFile = Path.GetTempFileName();
 
