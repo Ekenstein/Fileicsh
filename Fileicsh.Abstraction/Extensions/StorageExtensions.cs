@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Async;
 using System.Collections.Generic;
 using System.Security;
+using System.Threading;
 using System.Threading.Tasks;
 using Fileicsh.Abstraction.Helpers;
 
@@ -12,6 +14,21 @@ namespace Fileicsh.Abstraction.Extensions
     /// </summary>
     public static class StorageExtensions
     {
+        /// <summary>
+        /// Returns the given <paramref name="storage"/> as an <see cref="IPingableStorage"/>
+        /// that will be pinged through the given <paramref name="ping"/> lambda.
+        /// </summary>
+        /// <param name="storage">The storage to represent as an <see cref="IPingableStorage"/>.</param>
+        /// <param name="ping">The function that represents the ping operation.</param>
+        /// <returns>
+        /// An <see cref="IPingableStorage"/> representation of the given <paramref name="storage"/>
+        /// where the storage can be pinged through the given <paramref name="ping"/> lambda.
+        /// </returns>
+        public static IPingableStorage AsPingable(this IStorage storage, Func<Task<bool>> ping)
+        {
+            return new PingableStorage(storage, ping);
+        }
+
         /// <summary>
         /// Creates a prefixed storage of the given <paramref name="storage"/> which
         /// will prefix all the tags.
@@ -185,5 +202,54 @@ namespace Fileicsh.Abstraction.Extensions
 
         public static IReadOnlyList<AlphaNumericString> GetAllTags(this IStorage storage) => AsyncHelpers
             .RunSync(() => storage.GetTags().ToArrayAsync());
+
+        private class PingableStorage : IPingableStorage
+        {
+            private readonly IStorage _storage;
+            private readonly Func<Task<bool>> _ping;
+
+            public PingableStorage(IStorage storage, Func<Task<bool>> ping)
+            {
+                _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+                _ping = ping ?? throw new ArgumentNullException(nameof(ping));
+            }
+
+            public Task<bool> CreateFileAsync(IFile file, AlphaNumericString tag, CancellationToken cancellationToken = default)
+            {
+                return _storage.CreateFileAsync(file, tag, cancellationToken);
+            }
+
+            public Task<bool> DeleteFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
+            {
+                return _storage.DeleteFileAsync(file, tag, cancellationToken);
+            }
+
+            public Task<bool> DeleteTagAsync(AlphaNumericString tag, CancellationToken cancellationToken = default)
+            {
+                return _storage.DeleteTagAsync(tag, cancellationToken);
+            }
+
+            public void Dispose() => _storage.Dispose();
+
+            public Task<IFile> GetFileAsync(IFileInfo file, AlphaNumericString tag, CancellationToken cancellationToken = default)
+            {
+                return _storage.GetFileAsync(file, tag, cancellationToken);
+            }
+
+            public IAsyncEnumerable<IFile> GetFiles(AlphaNumericString tag) => _storage.GetFiles(tag);
+
+            public IAsyncEnumerable<AlphaNumericString> GetTags() => _storage.GetTags();
+
+            public Task MoveFileAsync(IFileInfo file, AlphaNumericString tag, AlphaNumericString destinationTag, CancellationToken cancellationToken = default)
+            {
+                return _storage.MoveFileAsync(file, tag, destinationTag, cancellationToken);
+            }
+
+            public Task<bool> PingAsync(CancellationToken cancellationToken = default)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return _ping();
+            }
+        }
     }
 }

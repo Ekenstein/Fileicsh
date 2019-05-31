@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.Abstraction", "Fileicsh.Abstraction\Fileicsh.Abstraction.csproj", "{4210A9B3-5AFA-487C-92EC-193C8C51838F}"
 EndProject
@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.CloudStorage.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.Crypto", "Fileicsh.Crypto\Fileicsh.Crypto.csproj", "{827EEC06-C0C4-4069-994F-B0273AFAF61C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileicsh.Crypto.Tests", "Fileicsh.Crypto.Tests\Fileicsh.Crypto.Tests.csproj", "{33335F84-8962-4138-970F-55E8F39873A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileicsh.Crypto.Tests", "Fileicsh.Crypto.Tests\Fileicsh.Crypto.Tests.csproj", "{33335F84-8962-4138-970F-55E8F39873A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileicsh.Compression", "Fileicsh.Compression\Fileicsh.Compression.csproj", "{3F712375-8FFE-40A7-B412-D5D6EE2A5FFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{33335F84-8962-4138-970F-55E8F39873A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33335F84-8962-4138-970F-55E8F39873A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33335F84-8962-4138-970F-55E8F39873A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F712375-8FFE-40A7-B412-D5D6EE2A5FFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F712375-8FFE-40A7-B412-D5D6EE2A5FFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F712375-8FFE-40A7-B412-D5D6EE2A5FFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F712375-8FFE-40A7-B412-D5D6EE2A5FFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
